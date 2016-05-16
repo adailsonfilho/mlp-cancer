@@ -39,6 +39,54 @@ if __name__ == '__main__':
 	print('Classe 0 size:',len(classe0))
 	print('Classe 1 size:',len(classe1))
 
+	
+	'''OVERSAMPLING'''
+	
+	sm = SMOTE(kind='regular', verbose='verbose')
+	svmx, svmy = sm.fit_transform(data, target)
+
+	print("Dados balanceados")
+	print("Tamanho da classe 0",len(svmx))
+	print("Tamanho da classe 1",len(svmy))
+
+    # print('SMOTE bordeline 1')
+    # sm = SMOTE(kind='borderline1', verbose=verbose)
+    # svmx, svmy = sm.fit_transform(classe0, classe1)
+
+    # print('SMOTE bordeline 2')
+    # sm = SMOTE(kind='borderline2', verbose=verbose)
+    # svmx, svmy = sm.fit_transform(classe0, classe1)
+
+    # print('SMOTE SVM')
+    # svm_args={'class_weight': 'auto'}
+    # sm = SMOTE(kind='svm', verbose=verbose, **svm_args)
+    # svmx, svmy = sm.fit_transform(classe0, classe1)
+
+    '''SPLITING DATA'''
+
+    #rondomize classe 0
+    np.random.shuffle(svmx)
+
+    #rondomize classe 1
+    np.random.shuffle(svmy)
+
+    #Prieira metade - 50%
+    halfx = int((len(svmx)*.5))
+    halfy = int((len(svmy)*.5))
+    trainingsetx = svmx[0:halfx]
+    trainingsety = svmy[0:halfy]
+
+    #Prieiro quarto - 25%
+    quarter1x = int((len(svmy)*.75))
+    quarter1y = int((len(svmy)*.75))
+    validationsetx = svmx[halfx:quarter1x]
+    validationsety = svmy[halfy:quarter1y]
+
+    #Segundo quarto - 25%
+    testsetx = svmx[quarter1x:]
+    testsety = svmy[quarter1y:]
+
+
 	'''LEARNING'''
 
 	# hiddenlayer1 = mlp.Layer(type='Sigmoid',name="hidden_layer_1",units=4)
@@ -57,22 +105,3 @@ if __name__ == '__main__':
 
 	# clf = MLPClassifier(algorithm='l-bfgs', alpha=1e-5, hidden_layer_sizes=(5, 1), random_state=1, shuffle=True)
 	# clf.fit(classe0, classe1)
-
-	sm = SMOTE(kind='regular', verbose='verbose')
-	svmx, svmy = sm.fit_transform(data, target)
-
-	print("Tamanho da classe 0",len(svmx))
-	print("Tamanho da classe 1",len(svmy))
-
-    # print('SMOTE bordeline 1')
-    # sm = SMOTE(kind='borderline1', verbose=verbose)
-    # svmx, svmy = sm.fit_transform(classe0, classe1)
-
-    # print('SMOTE bordeline 2')
-    # sm = SMOTE(kind='borderline2', verbose=verbose)
-    # svmx, svmy = sm.fit_transform(classe0, classe1)
-
-    # print('SMOTE SVM')
-    # svm_args={'class_weight': 'auto'}
-    # sm = SMOTE(kind='svm', verbose=verbose, **svm_args)
-    # svmx, svmy = sm.fit_transform(classe0, classe1)
