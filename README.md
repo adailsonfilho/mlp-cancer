@@ -1,0 +1,1 @@
+- Instalar o numpy + MLK para a versão especifica do python e sistema pelo link: http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy
