@@ -13,27 +13,19 @@ if __name__ == '__main__':
 	#READ
 	classe0 = []
 	classe1 = []
-	data = []
-	target =[]
 
 	with open('mammography-consolidated.csv', 'r') as csv:
 	    for line in csv:
 	    	line_ = [ float(val) for val in line.split(',')]
 
-	    	#for united data
-	    	# data.append(line_[:-1])
-	    	# target.append(int(line_[-1]))
-
 	    	#for separeted data
 	    	if line_[-1] == 0:
-	    		classe0.append(line_[:-1])
+	    		classe0.append(line_)
 	    	elif line_[-1] == 1:
-	    		classe1.append(line_[:-1])
+	    		classe1.append(line_)
 
 	classe0 = np.array(classe0)
 	classe1 = np.array(classe1)
-	# data = np.array(data)
-	# target = np.array(target)
 
 	print('Classe 0 size:',len(classe0))
 	print('Classe 1 size:',len(classe1))
@@ -48,16 +40,19 @@ if __name__ == '__main__':
 	halfx = int((len(classe0)*.5))
 	halfy = int((len(classe1)*.5))
 
-	trainingsetx = classe0[0:halfx]
-	trainingsety = classe1[0:halfy]
+	trainingsetx = classe0[:halfx, :-1]
+	trainingsety = classe1[:halfy, :-1]
+
+	data = np.concatenate((trainingsetx,trainingsety))
+	target = np.concatenate((classe0[:halfx,-1],classe1[:halfy,-1]))
 
 	print('Classe 0 training size:',len(trainingsetx))
 	print('Classe 1 training size:',len(trainingsety))
 
 	'''OVERSAMPLING'''
-	
+
 	sm = SMOTE(kind='regular', verbose=True)
-	svmx, svmy = sm.fit_transform(trainingsetx, trainingsety)
+	svmx, svmy = sm.fit_transform(data, target)
 
 	print('Classe 0 balanced training size:',len(svmx))
 	print('Classe 1 balanced training size:',len(svmy))
@@ -68,8 +63,11 @@ if __name__ == '__main__':
 	quarter1x = int((len(classe0)*.75))
 	quarter1y = int((len(classe1)*.75))
 
-	validationsetx = classe0[halfx:quarter1x]
-	validationsety = classe1[halfy:quarter1y]
+	validationsetx = classe0[halfx:quarter1x,:-1]
+	validationsety = classe1[halfy:quarter1y,:-1]
+
+	data = np.concatenate((validationsetx,validationsety))
+	target = np.concatenate((classe0[halfx:quarter1x,-1],classe1[halfy:quarter1y,-1]))
 
 	print('Classe 0 validation size:',len(validationsetx))
 	print('Classe 1 validation size:',len(validationsety))
@@ -77,7 +75,7 @@ if __name__ == '__main__':
 	'''OVERSAMPLING'''
 	
 	sm = SMOTE(kind='regular', verbose=True)
-	svmx, svmy = sm.fit_transform(validationsetx, validationsety)	
+	svmx, svmy = sm.fit_transform(data, target)
 
 	print('Classe 0 balanced validation size:',len(svmx))
 	print('Classe 1 balanced validation size:',len(svmy))	
@@ -88,13 +86,16 @@ if __name__ == '__main__':
 	testsetx = classe0[quarter1x:]
 	testsety = classe1[quarter1y:]
 
+	data = np.concatenate((testsetx,testsety))
+	target = np.concatenate((classe0[quarter1x:,-1],classe1[quarter1y:,-1]))
+
 	print('Classe 0 test size:',len(testsetx))
 	print('Classe 1 test size:',len(testsety))
 
 	'''OVERSAMPLING'''
 
 	sm = SMOTE(kind='regular', verbose=True)
-	svmx, svmy = sm.fit_transform(validationsetx, validationsety)	
+	svmx, svmy = sm.fit_transform(data, target)
 
 	print('Classe 0 balanced validation size:',len(svmx))
 	print('Classe 1 balanced validation size:',len(svmy))
