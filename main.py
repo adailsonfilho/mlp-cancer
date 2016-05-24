@@ -52,10 +52,11 @@ if __name__ == '__main__':
 	'''OVERSAMPLING'''
 
 	sm = SMOTE(kind='regular', verbose=True)
-	svmx, svmy = sm.fit_transform(data, target)
+	balancedTrainingSetData,balancedTrainingSetTarget = sm.fit_transform(data, target)
 
-	print('Classe 0 balanced training size:',len(svmx))
-	print('Classe 1 balanced training size:',len(svmy))
+	print('Balanced training size:',len(balancedTrainingSetData))
+	print('Balanced training data shape:',balancedTrainingSetData.shape)
+	print('Balanced training target shape:',balancedTrainingSetTarget.shape)
 
 ######################################################################################
 
@@ -69,16 +70,14 @@ if __name__ == '__main__':
 	data = np.concatenate((validationsetx,validationsety))
 	target = np.concatenate((classe0[halfx:quarter1x,-1],classe1[halfy:quarter1y,-1]))
 
-	print('Classe 0 validation size:',len(validationsetx))
-	print('Classe 1 validation size:',len(validationsety))
+	print('Validation size:',len(validationsetx))
 
 	'''OVERSAMPLING'''
 	
 	sm = SMOTE(kind='regular', verbose=True)
-	svmx, svmy = sm.fit_transform(data, target)
+	balancedValidationSetData, balancedValidationSetTarget = sm.fit_transform(data, target)
 
-	print('Classe 0 balanced validation size:',len(svmx))
-	print('Classe 1 balanced validation size:',len(svmy))	
+	print('Balanced validation size:',len(balancedValidationSetData))
 
 #######################################################################################
 
@@ -95,27 +94,24 @@ if __name__ == '__main__':
 	'''OVERSAMPLING'''
 
 	sm = SMOTE(kind='regular', verbose=True)
-	svmx, svmy = sm.fit_transform(data, target)
+	balancedTestSetData, balancedTestSetTarget = sm.fit_transform(data, target)
 
-	print('Classe 0 balanced validation size:',len(svmx))
-	print('Classe 1 balanced validation size:',len(svmy))
-
+	print('Balanced test size:',len(balancedTestSetData))
 
 	'''LEARNING'''
+	inputlayer = Layer(type='Sigmoid',name="input_layer_1",units=6)
+	hiddenlayer1 = Layer(type='Sigmoid',name="hidden_layer_1",units=4)
+	outputlayer = Layer(type='Softmax',name="output_layer",units=2)
 
-	# hiddenlayer1 = mlp.Layer(type='Sigmoid',name="hidden_layer_1",units=4)
-	# hiddenlayer2 = mlp.Layer(type='Sigmoid',name="hidden_layer_2",units=3)
-	# outputlayer = mlp.Layer(type='Linear',name="output_layer",units=1)
+	nn = Classifier(
+	    layers=[
+	    	inputlayer,
+	    	hiddenlayer1,
+			outputlayer],
+	    learning_rate=0.001,
+	    n_iter=100)
 
-	# nn = Classifier(
-	#     layers=[
-	#     	Layer(type='Sigmoid',name="hidden_layer_1",units=4),
-	# 		Layer(type='Sigmoid',name="hidden_layer_2",units=4),
-	# 		Layer(type='Softmax',name="output_layer",units=1)],
-	#     learning_rate=0.001,
-	#     n_iter=100)
-
-	# nn.fit(data,target)
+	nn.fit(balancedTrainingSetData,balancedTrainingSetTarget)
 
 	# clf = MLPClassifier(algorithm='l-bfgs', alpha=1e-5, hidden_layer_sizes=(5, 1), random_state=1, shuffle=True)
 	# clf.fit(classe0, classe1)
