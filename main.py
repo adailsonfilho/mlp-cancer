@@ -47,7 +47,7 @@ if __name__ == '__main__':
 	trainingsety = classe1[:halfy, :-1]
 
 	data = np.concatenate((trainingsetx,trainingsety))
-	target = np.concatenate((classe0[:halfx,-1],classe1[:halfy,-1]))
+	target = np.concatenate((classe0[:halfx,-1],classe1[:halfy,-1])).astype(int)
 
 	print('>> Training')
 
@@ -72,15 +72,15 @@ if __name__ == '__main__':
 	validationsetx = classe0[halfx:quarter1x,:-1]
 	validationsety = classe1[halfy:quarter1y,:-1]
 
-	vdata = np.concatenate((validationsetx,validationsety))
-	vtarget = np.concatenate((classe0[halfx:quarter1x,-1],classe1[halfy:quarter1y,-1]))
+	data = np.concatenate((validationsetx,validationsety))
+	target = np.concatenate((classe0[halfx:quarter1x,-1],classe1[halfy:quarter1y,-1])).astype(int)
 
-	print('>> Validation size:',len(validationsetx))
+	print('>> Validation size:',len(data))
 
 	'''OVERSAMPLING'''
 	
 	sm = SMOTE(kind='regular')
-	balancedValidationSetData, balancedValidationSetTarget = sm.fit_transform(vdata, vtarget)
+	balancedValidationSetData, balancedValidationSetTarget = sm.fit_transform(data, target)
 
 	print('Balanced validation size:',len(balancedValidationSetData))
 	print('Balanced validation data shape:',balancedValidationSetData.shape)
@@ -92,17 +92,14 @@ if __name__ == '__main__':
 	testsetx = classe0[quarter1x:,:-1]
 	testsety = classe1[quarter1y:,:-1]
 
-	tdata = np.concatenate((testsetx,testsety))
-	ttarget = np.concatenate((classe0[quarter1x:,-1],classe1[quarter1y:,-1]))
+	data = np.concatenate((testsetx,testsety))
+	target = np.concatenate((classe0[quarter1x:,-1],classe1[quarter1y:,-1])).astype(int)
 
 	print('>> Test')
 	print('Classe 0 test size:',len(testsetx))
 	print('Classe 1 test size:',len(testsety))
 
-	balancedTestSetData = tdata
-	balancedTestSetTarget = ttarget
-
-	print('Balanced test size:',len(balancedTestSetData))
+	print('Balanced test size:',len(data))
 
 	'''LEARNING'''
 	hiddenlayer1 = Layer(type='Sigmoid',name="input_layer_1",units=4)
@@ -112,11 +109,11 @@ if __name__ == '__main__':
 	print('Initializing cliassifier')
 	nn = Classifier(
 	    layers=[
-	    	# hiddenlayer1,
+	    	hiddenlayer1,
 	    	hiddenlayer2,
 			outputlayer],
-	    learning_rate=0.001,
-	    n_iter=20,
+	    learning_rate=0.0001,
+	    n_iter=50,
 	    valid_set=(balancedValidationSetData,balancedValidationSetTarget),
 	    verbose = True
 	    )
@@ -126,9 +123,18 @@ if __name__ == '__main__':
 
 	print('Testing')
 	errors = 0
-	for sample,obj in zip(data,target):
-		 if nn.predict(sample) != obj:
-		 	errors+= 1
+
+	predictions = nn.predict(data)
+
+	for predicted,obj in zip(predictions,target):
+
+		result = predicted
+
+		print(result[0], obj,end='')
+		if result[0] != obj:
+			print(' error')
+			errors += 1
+		print()
 
 	print("acurracy:", ((len(data)-errors)/len(data))*100,'%')
 	print('errors',errors,'of', len(data))
