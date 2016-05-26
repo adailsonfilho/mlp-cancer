@@ -1,5 +1,3 @@
-#!/usr/bin/python
-#coding: utf-8
 import numpy as np
 # import csv as libcsv
 import ipdb
@@ -58,7 +56,7 @@ if __name__ == '__main__':
 
 	'''OVERSAMPLING'''
 
-	sm = SMOTE(kind='svm', verbose=True)
+	sm = SMOTE(kind='regular', verbose=True)
 	balancedTrainingSetData,balancedTrainingSetTarget = sm.fit_transform(data, target)
 
 	print('Balanced training size:',len(balancedTrainingSetData))
