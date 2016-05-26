@@ -58,7 +58,7 @@ if __name__ == '__main__':
 
 	'''OVERSAMPLING'''
 
-	sm = SMOTE(kind='regular', verbose=True)
+	sm = SMOTE(kind='svm', verbose=True)
 	balancedTrainingSetData,balancedTrainingSetTarget = sm.fit_transform(data, target)
 
 	print('Balanced training size:',len(balancedTrainingSetData))
