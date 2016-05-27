@@ -1,8 +1,10 @@
 import numpy as np
 # import csv as libcsv
-import ipdb
+# import ipdb
+import matplotlib.pyplot as plt
 # Use the CPU in 64-bit mode.
 # from sknn.platform import cpu64
+from sknn.platform import cpu32, threading, threads4
 from sknn.mlp import Layer, Classifier
 # from sklearn.neural_network import MLPClassifier
 from unbalanced_dataset.over_sampling import SMOTE
@@ -102,19 +104,28 @@ if __name__ == '__main__':
 	print('Balanced test size:',len(data))
 
 	'''LEARNING'''
-	hiddenlayer1 = Layer(type='Sigmoid',name="input_layer_1",units=4)
-	hiddenlayer2 = Layer(type='Sigmoid',name="hidden_layer_1",units=3)
+	hiddenlayer1 = Layer(type='Sigmoid',name="input_layer_1",units=3)
+	hiddenlayer2 = Layer(type='Sigmoid',name="hidden_layer_1",units=2)
 	outputlayer = Layer(type='Softmax',name="output_layer")
+
+
+	error_train = []
+	error_valid = []
+
+	def store_errors(avg_valid_error, avg_train_error, **_):
+		error_train.append(avg_valid_error)
+		error_valid.append(avg_train_error)
 
 	print('Initializing cliassifier')
 	nn = Classifier(
 	    layers=[
 	    	hiddenlayer1,
-	    	hiddenlayer2,
+	    	# hiddenlayer2,
 			outputlayer],
 	    learning_rate=0.0001,
-	    n_iter=50,
+	    n_iter=100,
 	    valid_set=(balancedValidationSetData,balancedValidationSetTarget),
+	    callback={'on_epoch_finish': store_errors},
 	    verbose = True
 	    )
 
@@ -135,6 +146,10 @@ if __name__ == '__main__':
 			print(' error')
 			errors += 1
 		print()
+
+	plt.plot(error_train)
+	plt.plot(error_valid)
+	plt.show()
 
 	print("acurracy:", ((len(data)-errors)/len(data))*100,'%')
 	print('errors',errors,'of', len(data))
