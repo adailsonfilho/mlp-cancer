@@ -8,8 +8,6 @@ def save(fname, ext='png', close=True, verbose=True):
     # Set the directory and filename
     directory = 'results'
     filename = "%s.%s" % (fname, ext)
-    if directory == '':
-        directory = '.'
 
     # If the directory does not exist, create it
     if not os.path.exists(directory):

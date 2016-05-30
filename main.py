@@ -15,7 +15,11 @@ from sknn.mlp import Layer, Classifier
 from unbalanced_dataset.over_sampling import SMOTE
 
 filename = 'graph1'
-#sys.stdout = open('results/results.txt', 'w')
+
+if not os.path.exists('results'):
+        os.makedirs('results')
+
+#sys.stdout = open(os.path.join('results', 'results.txt'), 'w')
 
 if __name__ == '__main__':
 
