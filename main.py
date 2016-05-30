@@ -1,6 +1,7 @@
 #!/usr/bin/python
 #coding: utf-8
 import os
+import sys
 import utils
 import numpy as np
 # import csv as libcsv
@@ -14,6 +15,7 @@ from sknn.mlp import Layer, Classifier
 from unbalanced_dataset.over_sampling import SMOTE
 
 filename = 'graph1'
+#sys.stdout = open('results/results.txt', 'w')
 
 if __name__ == '__main__':
 
