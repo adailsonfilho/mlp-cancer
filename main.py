@@ -1,5 +1,7 @@
 #!/usr/bin/python
 #coding: utf-8
+import os
+import utils
 import numpy as np
 # import csv as libcsv
 # import ipdb
@@ -10,6 +12,8 @@ from sknn.platform import cpu32, threading, threads4
 from sknn.mlp import Layer, Classifier
 # from sklearn.neural_network import MLPClassifier
 from unbalanced_dataset.over_sampling import SMOTE
+
+filename = 'graph1'
 
 if __name__ == '__main__':
 
@@ -149,8 +153,8 @@ if __name__ == '__main__':
 			errors += 1
 		print()
 
-	plt.plot(error_train)
-	plt.plot(error_valid)
+	plt.plot(error_train, error_valid)
+	utils.save(filename)
 	plt.show()
 
 	print("acurracy:", ((len(data)-errors)/len(data))*100,'%')
