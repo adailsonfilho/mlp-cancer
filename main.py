@@ -3,7 +3,6 @@
 import os
 import sys
 import utils
-import confusionMatrix
 import numpy as np
 # import csv as libcsv
 # import ipdb
@@ -146,7 +145,7 @@ if __name__ == '__main__':
 	    	# hiddenlayer2,
 			outputlayer],
 	    learning_rate=0.0001,
-	    n_iter=3,
+	    n_iter=100,
 	    valid_set=(balancedValidationSetData,balancedValidationSetTarget),
 	    callback={'on_epoch_finish': store_errors},
 	    verbose = True
@@ -177,7 +176,7 @@ if __name__ == '__main__':
 	cm = confusion_matrix(target, predictions)
 	np.set_printoptions(precision=2)
 	plt.figure()
-	confusionMatrix.plot_confusion_matrix(cm)
+	utils.plot_confusion_matrix(cm)
 
 	print("acurracy:", ((len(data)-errors)/len(data))*100,'%')
 	print('errors',errors,'of', len(data))
