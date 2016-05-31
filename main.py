@@ -3,6 +3,7 @@
 import os
 import sys
 import utils
+import confusionMatrix
 import numpy as np
 # import csv as libcsv
 # import ipdb
@@ -71,16 +72,21 @@ if __name__ == '__main__':
 
 	'''OVERSAMPLING'''
 
+#	Oversampling por SMOTE
 	sm = SMOTE(kind='regular', verbose=True)
 	balancedTrainingSetData,balancedTrainingSetTarget = sm.fit_transform(data, target)
+	
+#	Oversampling por repetição simples
+	# balancedTrainingSetData = np.concatenate((trainingsetx,trainingsety.repeat(42, axis=0)))
+	# balancedTrainingSetTarget = np.concatenate((classe0[:halfx,-1],classe1[:halfy,-1].repeat(42, axis=0))).astype(int)	
 
 	print('Balanced training size:',len(balancedTrainingSetData))
 	print('Balanced training data shape:',balancedTrainingSetData.shape)
 	print('Balanced training target shape:',balancedTrainingSetTarget.shape)
 
-######################################################################################
+# ######################################################################################
 
-	#Primeiro quarto - conjunto de validação - 25%
+# 	#Primeiro quarto - conjunto de validação - 25%
 	quarter1x = int((len(classe0)*.75))
 	quarter1y = int((len(classe1)*.75))
 
@@ -97,13 +103,17 @@ if __name__ == '__main__':
 	sm = SMOTE(kind='regular')
 	balancedValidationSetData, balancedValidationSetTarget = sm.fit_transform(data, target)
 
+#	Oversampling por repetição simples
+	# balancedValidationSetData = np.concatenate((validationsetx,validationsety.repeat(42, axis=0)))
+	# balancedValidationSetTarget = np.concatenate((classe0[halfx:quarter1x,-1],classe1[halfy:quarter1y,-1].repeat(42, axis=0))).astype(int)
+
 	print('Balanced validation size:',len(balancedValidationSetData))
 	print('Balanced validation data shape:',balancedValidationSetData.shape)
 	print('Balanced validation target shape:',balancedValidationSetTarget.shape)
 
-#######################################################################################
+# #######################################################################################
 
-	#Segundo quarto - conjunto de teste - 25%
+# 	#Segundo quarto - conjunto de teste - 25%
 	testsetx = classe0[quarter1x:,:-1]
 	testsety = classe1[quarter1y:,:-1]
 
@@ -136,7 +146,7 @@ if __name__ == '__main__':
 	    	# hiddenlayer2,
 			outputlayer],
 	    learning_rate=0.0001,
-	    n_iter=100,
+	    n_iter=3,
 	    valid_set=(balancedValidationSetData,balancedValidationSetTarget),
 	    callback={'on_epoch_finish': store_errors},
 	    verbose = True
@@ -166,13 +176,12 @@ if __name__ == '__main__':
 
 	cm = confusion_matrix(target, predictions)
 	np.set_printoptions(precision=2)
-	print('Confusion matrix, without normalization')
-	print(cm)
 	plt.figure()
+	confusionMatrix.plot_confusion_matrix(cm)
 
 	print("acurracy:", ((len(data)-errors)/len(data))*100,'%')
 	print('errors',errors,'of', len(data))
 
 
-	# clf = MLPClassifier(algorithm='l-bfgs', alpha=1e-5, hidden_layer_sizes=(5, 1), random_state=1, shuffle=True)
-	# clf.fit(classe0, classe1)
+# 	# clf = MLPClassifier(algorithm='l-bfgs', alpha=1e-5, hidden_layer_sizes=(5, 1), random_state=1, shuffle=True)
+# 	# clf.fit(classe0, classe1)
