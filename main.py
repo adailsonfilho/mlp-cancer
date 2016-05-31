@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 # from sknn.platform import cpu64
 from sknn.platform import cpu32, threading, threads4
 from sknn.mlp import Layer, Classifier
+from sklearn.metrics import confusion_matrix
 # from sklearn.neural_network import MLPClassifier
 from unbalanced_dataset.over_sampling import SMOTE
 
@@ -156,6 +157,12 @@ if __name__ == '__main__':
 	plt.plot(error_train, error_valid)
 	utils.save(filename)
 	plt.show()
+
+	cm = confusion_matrix(target, predictions)
+	np.set_printoptions(precision=2)
+	print('Confusion matrix, without normalization')
+	print(cm)
+	plt.figure()
 
 	print("acurracy:", ((len(data)-errors)/len(data))*100,'%')
 	print('errors',errors,'of', len(data))
