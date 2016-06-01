@@ -1,7 +1,6 @@
 #!/usr/bin/python
 #coding: utf-8
-import os
-import sys
+import subprocess, os, sys
 import utils
 import numpy as np
 # import csv as libcsv
@@ -15,12 +14,14 @@ from sklearn.metrics import confusion_matrix
 # from sklearn.neural_network import MLPClassifier
 from unbalanced_dataset.over_sampling import SMOTE
 
-filename = 'graph1'
+#Save same output to file
+tee = subprocess.Popen(["tee", os.path.join('results', 'log.txt')], stdin=subprocess.PIPE)
+os.dup2(tee.stdin.fileno(), sys.stdout.fileno())
+os.dup2(tee.stdin.fileno(), sys.stderr.fileno())
 
+#create needed folder
 if not os.path.exists('results'):
         os.makedirs('results')
-
-#sys.stdout = open(os.path.join('results', 'results.txt'), 'w')
 
 if __name__ == '__main__':
 
@@ -139,6 +140,7 @@ if __name__ == '__main__':
 		error_valid.append(avg_train_error)
 
 	print('Initializing cliassifier')
+	
 	nn = Classifier(
 	    layers=[
 	    	hiddenlayer1,
@@ -150,33 +152,34 @@ if __name__ == '__main__':
 	    callback={'on_epoch_finish': store_errors},
 	    verbose = True
 	    )
-
+	
 	print('Fitting')
 	nn.fit(balancedTrainingSetData,balancedTrainingSetTarget)
+	#score = nn.score(balancedValidationSetData,balancedValidationSetTarget)
 
 	print('Testing')
 	errors = 0
 
-	predictions = nn.predict(data)
+	print(data)
+	predictions = np.squeeze(np.asarray(nn.predict(data)))
 
 	for predicted,obj in zip(predictions,target):
 
 		result = predicted
 
-		print(result[0], obj,end='')
-		if result[0] != obj:
+		print(result, obj,end='')
+		if result != obj:
 			print(' error')
 			errors += 1
 		print()
 
 	plt.plot(error_train, error_valid)
-	utils.save(filename)
+	#utils.save('test')
 	plt.show()
 
-	cm = confusion_matrix(target, predictions)
-	np.set_printoptions(precision=2)
-	plt.figure()
-	utils.plot_confusion_matrix(cm)
+	utils.plot_confusion_matrix(confusion_matrix(target, predictions))
+	utils.plot_mse_curve(np.array(error_train), np.array(error_valid))
+	utils.plot_roc_curve(target, predictions)
 
 	print("acurracy:", ((len(data)-errors)/len(data))*100,'%')
 	print('errors',errors,'of', len(data))
