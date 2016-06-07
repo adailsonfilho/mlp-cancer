@@ -4,7 +4,7 @@ import subprocess, os, sys
 import utils
 import numpy as np
 # import csv as libcsv
-# import ipdb
+import ipdb
 import matplotlib.pyplot as plt
 # Use the CPU in 64-bit mode.
 # from sknn.platform import cpu64
@@ -15,13 +15,13 @@ from sklearn.metrics import confusion_matrix
 from unbalanced_dataset.over_sampling import SMOTE
 
 #Save same output to file
-tee = subprocess.Popen(["tee", os.path.join('results', 'log.txt')], stdin=subprocess.PIPE)
-os.dup2(tee.stdin.fileno(), sys.stdout.fileno())
-os.dup2(tee.stdin.fileno(), sys.stderr.fileno())
+# tee = subprocess.Popen(["tee", os.path.join('results', 'log.txt')], stdin=subprocess.PIPE)
+# os.dup2(tee.stdin.fileno(), sys.stdout.fileno())
+# os.dup2(tee.stdin.fileno(), sys.stderr.fileno())
 
 #create needed folder
-if not os.path.exists('results'):
-        os.makedirs('results')
+# if not os.path.exists('results'):
+# 	os.makedirs('results')
 
 if __name__ == '__main__':
 
@@ -127,9 +127,11 @@ if __name__ == '__main__':
 	print('Balanced test size:',len(data))
 
 	'''LEARNING'''
-	hiddenlayer1 = Layer(type='Sigmoid',name="input_layer_1",units=3)
-	hiddenlayer2 = Layer(type='Sigmoid',name="hidden_layer_1",units=2)
-	outputlayer = Layer(type='Softmax',name="output_layer")
+	layers = [
+		Layer(type='Sigmoid',name="hidden_layer_1",units=3),
+		Layer(type='Sigmoid',name="hidden_layer_2",units=2),
+		Layer(type='Softmax',name="output_layer",units = 3)
+	]
 
 
 	error_train = []
@@ -142,18 +144,16 @@ if __name__ == '__main__':
 	print('Initializing cliassifier')
 	
 	nn = Classifier(
-	    layers=[
-	    	hiddenlayer1,
-	    	# hiddenlayer2,
-			outputlayer],
+	    layers=layers,
 	    learning_rate=0.0001,
-	    n_iter=100,
+	    n_iter=50,
 	    valid_set=(balancedValidationSetData,balancedValidationSetTarget),
 	    callback={'on_epoch_finish': store_errors},
 	    verbose = True
 	    )
 	
 	print('Fitting')
+	ipdb.set_trace()
 	nn.fit(balancedTrainingSetData,balancedTrainingSetTarget)
 	#score = nn.score(balancedValidationSetData,balancedValidationSetTarget)
 
@@ -173,9 +173,9 @@ if __name__ == '__main__':
 			errors += 1
 		print()
 
-	plt.plot(error_train, error_valid)
-	#utils.save('test')
-	plt.show()
+	# plt.plot(error_train, error_valid)
+	# #utils.save('test')
+	# plt.show()
 
 	utils.plot_confusion_matrix(confusion_matrix(target, predictions))
 	utils.plot_mse_curve(np.array(error_train), np.array(error_valid))
