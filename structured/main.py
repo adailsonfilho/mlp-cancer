@@ -6,6 +6,7 @@ from enums import Oversampling
 from sknn.platform import cpu32, threading, threads4
 from sknn.mlp import Layer, Classifier
 
+from metrics import Metrics
 
 if __name__ == '__main__':
 
@@ -23,35 +24,38 @@ if __name__ == '__main__':
 	"""
 
 	#currently, only oversample
-	sampling_options = [Oversampling.Repeat, Oversampling.SmoteRegular, Oversampling.DontUse]
+	sampling_options = [Oversampling.SmoteRegular]
+	#sampling_options = [Oversampling.Repeat, Oversampling.SmoteRegular, Oversampling.DontUse]
 
 	# learning_rule = stochastic gradient descent ('sgd'), 'momentum', 'nesterov', 'adadelta', 'adagrad', 'rmsprop'
-	learning_rule_options = ['sgd', 'momentum','rmsprop']
+	learning_rule_options = ['sgd']
+	#learning_rule_options = ['sgd', 'momentum','rmsprop']
 
 	#following the SKNN docs
-	activation_function_options = ['Rectifier', 'Sigmoid', 'Tanh', 'ExpLin']
+	activation_function_options = ['Sigmoid']
+	#activation_function_options = ['Rectifier', 'Sigmoid', 'Tanh', 'ExpLin']
 
 	#based on W.I.W.T. - What I Want To
 	topology_options = [
 		[
 			{'name':'hidden', 'units':5}
 		],
-		[
-			{'name':'hidden', 'units':20}
-		],
-		[
-			{'name':'hidden1', 'units':5},
-			{'name':'hidden2', 'units':2},
-		],
-		[
-			{'name':'hidden1', 'units':5},
-			{'name':'hidden2', 'units':4},
-			{'name':'hidden3', 'units':3}
-		],
-		[
-			{'name':'hidden1', 'units':50},
-			{'name':'hidden2', 'units':30},
-		]
+		# [
+		# 	{'name':'hidden', 'units':20}
+		# ],
+		# [
+		# 	{'name':'hidden1', 'units':5},
+		# 	{'name':'hidden2', 'units':2},
+		# ],
+		# [
+		# 	{'name':'hidden1', 'units':5},
+		# 	{'name':'hidden2', 'units':4},
+		# 	{'name':'hidden3', 'units':3}
+		# ],
+		# [
+		# 	{'name':'hidden1', 'units':50},
+		# 	{'name':'hidden2', 'units':30},
+		# ]
 
 	]
 
@@ -65,7 +69,7 @@ if __name__ == '__main__':
 			training['data'], training['target'] = oversampler.balance()
 
 			"""
-			TRAINING OVER SAMPLE
+			VALIDATION OVER SAMPLE
 			"""
 			oversampler = Oversampler(opt_samp,validation['data'], validation['target'],True )
 			validation['data'], validation['target'] = oversampler.balance()
@@ -98,7 +102,7 @@ if __name__ == '__main__':
 					nn = Classifier(
 				    layers=layers,
 				    learning_rate=0.001,
-				    n_iter=10,
+				    n_iter=100,
 				    valid_set=(base['validation']['data'],base['validation']['target']),
 				    callback={'on_epoch_finish': store_errors},
 				    verbose = verbose
@@ -110,7 +114,7 @@ if __name__ == '__main__':
 					errors = 0
 
 					predictions = np.squeeze(np.asarray(nn.predict(base['testing']['data'])))
-
+					target = base['testing']['target']
 					for predicted, obj in zip(predictions,base['testing']['target']):
 						result = predicted
 
@@ -118,5 +122,9 @@ if __name__ == '__main__':
 							# print(' error')
 							errors += 1
 
+					Metrics.plot_confusion_matrix(target, predictions)
+					Metrics.plot_mse_curve(np.array(error_train), np.array(error_valid))
+					Metrics.plot_roc_curve(target, predictions)
+					
 					print("acurracy:", ((len(base['testing']['data'])-errors)/len(base['testing']['data']))*100,'%')
 					print('errors',errors,'of', len(base['testing']['data']))
