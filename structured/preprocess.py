@@ -1,5 +1,4 @@
 import numpy as np
-from enums import Sampling
 
 class Data:
 
@@ -57,36 +56,77 @@ class Data:
 		"""
 		Split by classes
 		"""	
-		classes = []
+
+		training_sets = None
+		training_targets = None
+
+		validation_sets = None
+		validation_targets = None
+
+		testing_sets = None
+		testing_targets = None
 
 		for opt in self.target_options:
-			class_opt = data[:,opt == self.target]
+			class_opt = self.data[opt == self.target]
 
 			#randomize samples in each class
 			np.random.shuffle(class_opt)
-			classes.append(class_opt)
-
-		training_sets = []
-		validation_sets = []
-		testing_sets = []
-
-		#Preparando conjunto de treinamento - 50%
-		for class_opt in classes:
 
 			"""
 			Training Data Set
 			"""
-			train_index = int(len(opt)*training_percent)
-			training_sets.append(class_opt[:train_index])
+			train_index = int(len(class_opt)*training_percent)
+			training_set = class_opt[:train_index]
+
+			if training_sets == None:
+				training_sets = training_set
+			else:
+				training_sets = np.concatenate((training_sets,training_set))
+
+			training_target = np.array([opt for i in range(len(training_set))])
+
+			if training_targets == None:
+				training_targets = training_target
+			else:
+				training_targets = np.concatenate((training_targets,training_target))
 
 			"""
 			Validating
 			"""
-			validation_index = int(len(opt)*(training_percent+validation_percent))
-			validation_sets.append(class_opt[train_index:validation_index])
+			validation_index = int(len(class_opt)*(training_percent+validation_percent))			
+			validation_set = class_opt[train_index:validation_index]
+
+			if validation_sets == None:
+				validation_sets = validation_set
+			else:
+				validation_sets = np.concatenate((validation_sets,validation_set))
+
+			validation_target = np.array([opt for i in range(len(validation_set))])
+			
+			if validation_targets == None:
+				validation_targets = validation_target
+			else:
+				validation_targets = np.concatenate((validation_targets,validation_target))
+
+
 
 			"""
 			Testing
 			"""
-			testing_sets.append(class_opt[validation_index:])
-		return training_sets, validation_sets, testing_sets
+			testing_set = class_opt[validation_index:]
+
+			if testing_sets == None:
+				testing_sets = testing_set
+			else:
+				testing_sets = np.concatenate((testing_sets,testing_set))
+
+			testing_target = np.array([opt for i in range(len(testing_set))])
+			
+			if testing_targets == None:
+				testing_targets = testing_target
+			else:
+				testing_targets = np.concatenate((testing_targets,testing_target))
+
+
+
+		return {'data':training_sets, 'target': training_targets}, {'data':validation_sets,'target':validation_targets}, {'data':testing_sets,'target':testing_targets}

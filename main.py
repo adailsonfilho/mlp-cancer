@@ -4,7 +4,7 @@ import subprocess, os, sys
 import utils
 import numpy as np
 # import csv as libcsv
-import ipdb
+# import ipdb
 import matplotlib.pyplot as plt
 # Use the CPU in 64-bit mode.
 # from sknn.platform import cpu64
@@ -130,7 +130,7 @@ if __name__ == '__main__':
 	layers = [
 		Layer(type='Sigmoid',name="hidden_layer_1",units=3),
 		Layer(type='Sigmoid',name="hidden_layer_2",units=2),
-		Layer(type='Softmax',name="output_layer",units = 3)
+		Layer(type='Softmax',name="output_layer")
 	]
 
 
@@ -153,7 +153,6 @@ if __name__ == '__main__':
 	    )
 	
 	print('Fitting')
-	ipdb.set_trace()
 	nn.fit(balancedTrainingSetData,balancedTrainingSetTarget)
 	#score = nn.score(balancedValidationSetData,balancedValidationSetTarget)
 
