@@ -97,8 +97,8 @@ if __name__ == '__main__':
 
 					nn = Classifier(
 				    layers=layers,
-				    learning_rate=0.0001,
-				    n_iter=50,
+				    learning_rate=0.001,
+				    n_iter=10,
 				    valid_set=(base['validation']['data'],base['validation']['target']),
 				    callback={'on_epoch_finish': store_errors},
 				    verbose = verbose
@@ -109,15 +109,14 @@ if __name__ == '__main__':
 					print('Testing')
 					errors = 0
 
-					print(data)
-					predictions = np.squeeze(np.asarray(nn.predict(data)))
+					predictions = np.squeeze(np.asarray(nn.predict(base['testing']['data'])))
 
-					for predicted,obj in zip(predictions,target):
+					for predicted, obj in zip(predictions,base['testing']['target']):
 						result = predicted
 
 						if result != obj:
 							# print(' error')
 							errors += 1
 
-					print("acurracy:", ((len(data)-errors)/len(data))*100,'%')
-					print('errors',errors,'of', len(data))
+					print("acurracy:", ((len(base['testing']['data'])-errors)/len(base['testing']['data']))*100,'%')
+					print('errors',errors,'of', len(base['testing']['data']))
