@@ -70,7 +70,7 @@ if __name__ == '__main__':
 
 		if opt_samp != Oversampling.DontUse:
 			configDesc['opt_samp'] = ''
-			configDesc['opt_samp'] = opt_samp
+			configDesc['opt_samp'] = opt_samp.name
 			"""
 			TRAINING OVER SAMPLE
 			"""
