@@ -15,7 +15,7 @@ from sklearn.metrics import confusion_matrix
 
 class Metrics:
 
-	def plot_confusion_matrix(target, predictions, title='Confusion matrix', cmap=plt.cm.Blues):
+	def plot_confusion_matrix(target, predictions, path, title='Confusion matrix', cmap=plt.cm.Blues):
 		cm = confusion_matrix(target, predictions)
 		np.set_printoptions(precision=2)
 		plt.figure()
@@ -28,12 +28,12 @@ class Metrics:
 		plt.tight_layout()
 		plt.ylabel('True label')
 		plt.xlabel('Predicted label')
-		Metrics.save(title)
+		Metrics.save(title, path)
 		print('Confusion Matrix:')
 		print(cm)
 		plt.show()
 
-	def plot_roc_curve(y_test, y_score, title='ROC Curve'):
+	def plot_roc_curve(y_test, y_score, path, title='ROC Curve'):
 	    fpr = dict()
 	    tpr = dict()
 	    roc_auc = dict()
@@ -86,10 +86,10 @@ class Metrics:
 	    plt.ylabel('True Positive Rate')
 	    plt.title('Some extension of Receiver operating characteristic to multi-class')
 	    plt.legend(loc="lower right")
-	    Metrics.save(title)
+	    Metrics.save(title, path)
 	    plt.show()
 
-	def plot_mse_curve(X, y, title='MSE Curve'):
+	def plot_mse_curve(X, y, path, title='MSE Curve'):
 	    degrees = [1, 4, 15]
 	    
 	    true_fun = lambda X: np.cos(1.5 * np.pi * X)
@@ -123,21 +123,21 @@ class Metrics:
 	        plt.title("Degree {}\nMSE = {:.2e}(+/- {:.2e})".format(
 	            degrees[i], -scores.mean(), scores.std())
 	        )
-	    Metrics.save(title)
+	    Metrics.save(title, path)
 	    plt.show()
 
-	def save(fname, ext='png', close=True, verbose=True):
+	def save(fname, path, ext='png', close=True, verbose=True):
 
 		# Set the directory and filename
-		directory = 'results'
+		#directory = 'results'
 		filename = "%s.%s" % (fname, ext)
 
 		# If the directory does not exist, create it
-		if not os.path.exists(directory):
-		    os.makedirs(directory)
+		#if not os.path.exists(directory):
+		#    os.makedirs(directory)
 
 		# The final path to save to
-		savepath = os.path.join(directory, filename)
+		savepath = os.path.join(path, filename)
 
 		if verbose:
 		    print("Saving figure to '%s'..." % savepath),
@@ -151,3 +151,8 @@ class Metrics:
 
 		if verbose:
 		    print("Done")
+
+	def saveConfig(path, config):
+		with open(path, 'w') as output:
+			output.write(str(config))
+			
