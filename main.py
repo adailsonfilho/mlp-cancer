@@ -128,8 +128,8 @@ if __name__ == '__main__':
 
 	'''LEARNING'''
 	layers = [
-		Layer(type='Sigmoid',name="hidden_layer_1",units=3),
-		Layer(type='Sigmoid',name="hidden_layer_2",units=2),
+		Layer(type='Sigmoid',name="hidden_layer_1",units=5),
+		#Layer(type='Sigmoid',name="hidden_layer_2",units=2),
 		Layer(type='Softmax',name="output_layer")
 	]
 
@@ -145,8 +145,8 @@ if __name__ == '__main__':
 	
 	nn = Classifier(
 	    layers=layers,
-	    learning_rate=0.0001,
-	    n_iter=50,
+	    learning_rate=0.01,
+	    n_iter=1000,
 	    valid_set=(balancedValidationSetData,balancedValidationSetTarget),
 	    callback={'on_epoch_finish': store_errors},
 	    verbose = True
@@ -166,7 +166,7 @@ if __name__ == '__main__':
 
 		result = predicted
 
-		print(result, obj,end='')
+		#print(result, obj,end='')
 		if result != obj:
 			print(' error')
 			errors += 1

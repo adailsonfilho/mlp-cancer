@@ -26,7 +26,7 @@ if __name__ == '__main__':
 	"""
 
 	#currently, only oversample
-	sampling_options = [Oversampling.SmoteRegular]
+	sampling_options = [Oversampling.Repeat]
 	#sampling_options = [Oversampling.Repeat, Oversampling.SmoteRegular, Oversampling.DontUse]
 
 	# learning_rule = stochastic gradient descent ('sgd'), 'momentum', 'nesterov', 'adadelta', 'adagrad', 'rmsprop'
@@ -34,7 +34,7 @@ if __name__ == '__main__':
 	#learning_rule_options = ['sgd', 'momentum','rmsprop']
 
 	#following the SKNN docs
-	activation_function_options = ['Sigmoid', 'Rectifier']
+	activation_function_options = ['Sigmoid']
 	#activation_function_options = ['Rectifier', 'Sigmoid', 'Tanh', 'ExpLin']
 
 	#based on W.I.W.T. - What I Want To
@@ -42,9 +42,9 @@ if __name__ == '__main__':
 		[
 			{'name':'hidden', 'units':5}
 		],
-		[
-			{'name':'hidden', 'units':20}
-		],
+		#[
+		#	{'name':'hidden', 'units':20}
+		#],
 		# [
 		# 	{'name':'hidden1', 'units':5},
 		# 	{'name':'hidden2', 'units':2},
@@ -110,15 +110,14 @@ if __name__ == '__main__':
 						error_valid.append(avg_train_error)
 
 					'''LEARNING'''
-					#setting up Neural Network
 
 					layers = [Layer(type=opt_actvfunc,name=topology['name'],units=topology['units']) for topology in opt_top];
 					layers.append(Layer(type='Softmax',name="output_layer"))
 
 					nn = Classifier(
 				    layers=layers,
-				    learning_rate=0.001,
-				    n_iter=10,
+				    learning_rate=0.00001,
+				    n_iter=150,
 				    valid_set=(base['validation']['data'],base['validation']['target']),
 				    callback={'on_epoch_finish': store_errors},
 				    verbose = verbose
