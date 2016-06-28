@@ -78,7 +78,7 @@ class Metrics:
 	    for i in range(0, 1):
 	        plt.plot(fpr[i], tpr[i], label='ROC curve of class {0} (area = {1:0.2f})'
 	                                       ''.format(i, roc_auc[i]))
-	    
+	    #plt.grid()
 	    plt.plot([0, 1], [0, 1], 'k--')
 	    plt.xlim([0.0, 1.0])
 	    plt.ylim([0.0, 1.05])
