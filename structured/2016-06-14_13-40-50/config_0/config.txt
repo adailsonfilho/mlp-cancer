@@ -1,1 +1,0 @@
-{'opt_learning': 'sgd', 'opt_samp': 2, 'activation_function_options': 'Sigmoid', 'topology_options': [{'name': 'hidden', 'units': 5}]}
