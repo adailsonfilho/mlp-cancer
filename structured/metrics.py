@@ -31,13 +31,13 @@ class Metrics:
 		Metrics.save(title, path)
 		print('Confusion Matrix:')
 		print(cm)
-		plt.show()
+		# plt.show()
 
 	def plot_roc_curve(y_test, y_score, path, title='ROC Curve'):
 	    fpr = dict()
 	    tpr = dict()
 	    roc_auc = dict()
-	    for i in range(0, 1):
+	    for i in range(2):
 	        #fpr[i], tpr[i], _ = roc_curve(y_test[:, i], y_score[:, i])
 	        fpr[i], tpr[i], _ = roc_curve(y_test, y_score)
 	        roc_auc[i] = auc(fpr[i], tpr[i])
@@ -49,15 +49,15 @@ class Metrics:
 	    #Plot ROC curves for the multiclass problem
 	    # Compute macro-average ROC curve and ROC area
 	    # First aggregate all false positive rates
-	    all_fpr = np.unique(np.concatenate([fpr[i] for i in range(0, 1)]))
+	    all_fpr = np.unique(np.concatenate([fpr[i] for i in range(2)]))
 	    
 	    # Then interpolate all ROC curves at this points
 	    mean_tpr = np.zeros_like(all_fpr)
-	    for i in range(0, 1):
+	    for i in range(2):
 	        mean_tpr += interp(all_fpr, fpr[i], tpr[i])
 	    
 	    # Finally average it and compute AUC
-	    mean_tpr /= range(0, 1)
+	    mean_tpr /= range(1)
 	    
 	    fpr["macro"] = all_fpr
 	    tpr["macro"] = mean_tpr
@@ -75,7 +75,7 @@ class Metrics:
 	                   ''.format(roc_auc["macro"]),
 	             linewidth=2)
 	    
-	    for i in range(0, 1):
+	    for i in range(1):
 	        plt.plot(fpr[i], tpr[i], label='ROC curve of class {0} (area = {1:0.2f})'
 	                                       ''.format(i, roc_auc[i]))
 	    
@@ -87,7 +87,7 @@ class Metrics:
 	    plt.title('Some extension of Receiver operating characteristic to multi-class')
 	    plt.legend(loc="lower right")
 	    Metrics.save(title, path)
-	    plt.show()
+	    # plt.show()
 
 	def plot_mse_curve(X, y, path, title='MSE Curve'):
 	    degrees = [1, 4, 15]
@@ -100,8 +100,7 @@ class Metrics:
 	        ax = plt.subplot(1, len(degrees), i + 1)
 	        plt.setp(ax, xticks=(), yticks=())
 	    
-	        polynomial_features = PolynomialFeatures(degree=degrees[i],
-	                                                 include_bias=False)
+	        polynomial_features = PolynomialFeatures(degree=degrees[i], include_bias=False)
 	        linear_regression = LinearRegression()
 	        pipeline = Pipeline([("polynomial_features", polynomial_features),
 	                             ("linear_regression", linear_regression)])
@@ -124,7 +123,7 @@ class Metrics:
 	            degrees[i], -scores.mean(), scores.std())
 	        )
 	    Metrics.save(title, path)
-	    plt.show()
+	    # plt.show()
 
 	def save(fname, path, ext='png', close=True, verbose=True):
 

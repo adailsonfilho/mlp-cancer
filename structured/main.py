@@ -26,15 +26,15 @@ if __name__ == '__main__':
 	"""
 
 	#currently, only oversample
-	sampling_options = [Oversampling.SmoteRegular]
+	sampling_options = [Oversampling.Repeat, Oversampling.SmoteRegular]
 	#sampling_options = [Oversampling.Repeat, Oversampling.SmoteRegular, Oversampling.DontUse]
 
 	# learning_rule = stochastic gradient descent ('sgd'), 'momentum', 'nesterov', 'adadelta', 'adagrad', 'rmsprop'
-	learning_rule_options = ['sgd']
+	learning_rule_options = [u'momentum',u'sgd']
 	#learning_rule_options = ['sgd', 'momentum','rmsprop']
 
 	#following the SKNN docs
-	activation_function_options = ['Sigmoid', 'Rectifier']
+	activation_function_options = ['Sigmoid', 'Rectifier','Tanh']
 	#activation_function_options = ['Rectifier', 'Sigmoid', 'Tanh', 'ExpLin']
 
 	#based on W.I.W.T. - What I Want To
@@ -45,10 +45,11 @@ if __name__ == '__main__':
 		[
 			{'name':'hidden', 'units':20}
 		],
-		# [
-		# 	{'name':'hidden1', 'units':5},
-		# 	{'name':'hidden2', 'units':2},
-		# ],
+		[
+			{'name':'hidden1', 'units':5},
+			{'name':'hidden2', 'units':4},
+			{'name':'hidden2', 'units':3}
+		]
 		# [
 		# 	{'name':'hidden1', 'units':5},
 		# 	{'name':'hidden2', 'units':4},
@@ -71,10 +72,11 @@ if __name__ == '__main__':
 		if opt_samp != Oversampling.DontUse:
 			configDesc['opt_samp'] = ''
 			configDesc['opt_samp'] = opt_samp.name
+
 			"""
 			TRAINING OVER SAMPLE
 			"""
-			oversampler = Oversampler(opt_samp,training['data'], training['target'],True )
+			oversampler = Oversampler(opt_samp, training['data'], training['target'], True)
 			training['data'], training['target'] = oversampler.balance()
 
 			"""
@@ -116,9 +118,10 @@ if __name__ == '__main__':
 					layers.append(Layer(type='Softmax',name="output_layer"))
 
 					nn = Classifier(
+					learning_rule = opt_learning
 				    layers=layers,
 				    learning_rate=0.001,
-				    n_iter=10,
+				    n_iter=10000,
 				    valid_set=(base['validation']['data'],base['validation']['target']),
 				    callback={'on_epoch_finish': store_errors},
 				    verbose = verbose
