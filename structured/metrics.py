@@ -31,30 +31,28 @@ class Metrics:
 		Metrics.save(title, path)
 		print('Confusion Matrix:')
 		print(cm)
+		# plt.show()
 
 	def plot_roc_curve(y_test, y_score, path, title='ROC Curve'):
-	    fpr = dict()
-	    tpr = dict()
-	    roc_auc = dict()
-	    for i in range(0, 1):
-	        #fpr[i], tpr[i], _ = roc_curve(y_test[:, i], y_score[:, i])
-	        fpr[i], tpr[i], _ = roc_curve(y_test, y_score)
-	        roc_auc[i] = auc(fpr[i], tpr[i])
-	        
+		fpr = dict()
+		tpr = dict()
+		roc_auc = dict()
+		fpr, tpr, _ = roc_curve(y_test, y_score)
+		roc_auc = auc(fpr, tpr)
+
 	    # Plot all ROC curves
-	    plt.figure()
-	    for i in range(0, 1):
-	        plt.plot(fpr[i], tpr[i], label='ROC curve of class {0} (area = {1:0.2f})'
-	                                       ''.format(i, roc_auc[i]))
-	    
-	    plt.plot([0, 1], [0, 1], 'k--')
-	    plt.xlim([0.0, 1.0])
-	    plt.ylim([0.0, 1.05])
-	    plt.xlabel('False Positive Rate')
-	    plt.ylabel('True Positive Rate')
-	    plt.title('Some extension of Receiver operating characteristic to multi-class')
-	    plt.legend(loc="lower right")
-	    Metrics.save(title, path)
+		plt.figure()
+		print(roc_auc)
+		plt.plot(fpr, tpr, label='ROC curve (area = ' + str(roc_auc) + ' )')
+		#plt.grid()
+		plt.plot([0, 1], [0, 1], 'k--')
+		plt.xlim([0.0, 1.0])
+		plt.ylim([0.0, 1.05])
+		plt.xlabel('False Positive Rate')
+		plt.ylabel('True Positive Rate')
+		plt.legend(loc="lower right")
+		Metrics.save(title, path)
+	    # plt.show()
 
 	def plot_mse_curve(X, y, path, title='MSE Curve'):
 	    degrees = [1, 4, 15]
@@ -67,8 +65,7 @@ class Metrics:
 	        ax = plt.subplot(1, len(degrees), i + 1)
 	        plt.setp(ax, xticks=(), yticks=())
 	    
-	        polynomial_features = PolynomialFeatures(degree=degrees[i],
-	                                                 include_bias=False)
+	        polynomial_features = PolynomialFeatures(degree=degrees[i], include_bias=False)
 	        linear_regression = LinearRegression()
 	        pipeline = Pipeline([("polynomial_features", polynomial_features),
 	                             ("linear_regression", linear_regression)])
@@ -91,6 +88,8 @@ class Metrics:
 	            degrees[i], -scores.mean(), scores.std())
 	        )
 	    Metrics.save(title, path)
+	    # plt.show()
+
 
 	def save(fname, path, ext='png', close=True, verbose=True):
 

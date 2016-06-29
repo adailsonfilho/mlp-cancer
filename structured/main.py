@@ -18,7 +18,7 @@ if __name__ == '__main__':
 	Pre-process
 	"""
 
-	base = Data('..\mammography-consolidated.csv',verbose=verbose)
+	base = Data(os.path.join('..', 'mammography-consolidated.csv'),verbose=verbose)
 	training, validation, testing = base.split()
 
 	"""
@@ -27,14 +27,16 @@ if __name__ == '__main__':
 
 	#currently, only oversample
 	sampling_options = [Oversampling.Repeat]
-	#sampling_options = [Oversampling.Repeat, Oversampling.SmoteRegular, Oversampling.DontUse]
+	#sampling_options = [Oversampling.Repeat, Oversampling.SmoteRegular]
 
 	# learning_rule = stochastic gradient descent ('sgd'), 'momentum', 'nesterov', 'adadelta', 'adagrad', 'rmsprop'
-	learning_rule_options = ['sgd']
+	learning_rule_options = ['momentum','sgd']
 	#learning_rule_options = ['sgd', 'momentum','rmsprop']
 
 	#following the SKNN docs
 	activation_function_options = ['Sigmoid']
+	#activation_function_options = ['Sigmoid', 'Rectifier','Tanh']
+
 	#activation_function_options = ['Rectifier', 'Sigmoid', 'Tanh', 'ExpLin']
 
 	#based on W.I.W.T. - What I Want To
@@ -71,10 +73,11 @@ if __name__ == '__main__':
 		if opt_samp != Oversampling.DontUse:
 			configDesc['opt_samp'] = ''
 			configDesc['opt_samp'] = opt_samp.name
+
 			"""
 			TRAINING OVER SAMPLE
 			"""
-			oversampler = Oversampler(opt_samp,training['data'], training['target'],True )
+			oversampler = Oversampler(opt_samp, training['data'], training['target'], True)
 			training['data'], training['target'] = oversampler.balance()
 
 			"""
@@ -97,7 +100,7 @@ if __name__ == '__main__':
 				for opt_actvfunc in activation_function_options:
 					configDesc['activation_function_options'] = ''
 					configDesc['activation_function_options'] = opt_actvfunc
-					configDir = mydir + '\config_' + str(nConfig)
+					configDir = os.path.join(mydir, 'config_' + str(nConfig))
 					os.makedirs(configDir)
 					config = Config(base, opt_learning, opt_top, opt_actvfunc, force_overfiting = False)
 
@@ -115,9 +118,10 @@ if __name__ == '__main__':
 					layers.append(Layer(type='Softmax',name="output_layer"))
 
 					nn = Classifier(
+					learning_rule = opt_learning,
 				    layers=layers,
-				    learning_rate=0.00001,
-				    n_iter=150,
+				    learning_rate=0.001,
+				    n_iter=10000,
 				    valid_set=(base['validation']['data'],base['validation']['target']),
 				    callback={'on_epoch_finish': store_errors},
 				    verbose = verbose
@@ -127,20 +131,41 @@ if __name__ == '__main__':
 
 					print('Testing')
 					errors = 0
-
 					predictions = np.squeeze(np.asarray(nn.predict(base['testing']['data'])))
 					target = base['testing']['target']
+
+					print('testing set', base['testing']['target'])
+					print('predictions', predictions)
+
+					#targetClass0 = np.array([],dtype=np.int32)
+					#targetClass1 = np.array([],dtype=np.int32)
+					#targetByClass = np.array([0,0])
+					#predictionsForClass0 = np.array([],dtype=np.int32)
+					#predictionsForClass1 = np.array([],dtype=np.int32)
+
 					for predicted, obj in zip(predictions,base['testing']['target']):
 						result = predicted
 
 						if result != obj:
 							# print(' error')
 							errors += 1
+						
+					#	if obj == 0:
+					#		targetByClass = np.vstack([targetByClass, [1,0]])
+					#		predictionsForClass0 = np.append(predictionsForClass0, predicted)
+					#	else:
+					#		targetByClass = np.vstack([targetByClass, [0,1]])
+					#		predictionsForClass1 = np.append(predictionsForClass1, predicted)
+
+					#predictionsByClass = [predictionsForClass0,predictionsForClass1]
+
+					#targetByClass = np.delete(targetByClass, 0, 0)
+					#targetByClass = np.asarray(targetByClass)
 
 					Metrics.plot_confusion_matrix(target, predictions, configDir)
 					Metrics.plot_mse_curve(np.array(error_train), np.array(error_valid), configDir)
 					Metrics.plot_roc_curve(target, predictions, configDir)
-					Metrics.saveConfig(configDir+'\config.txt', configDesc)
+					Metrics.saveConfig(os.path.join(configDir, 'config.txt'), configDesc)
 
 					print("acurracy:", ((len(base['testing']['data'])-errors)/len(base['testing']['data']))*100,'%')
 					print('errors',errors,'of', len(base['testing']['data']))
