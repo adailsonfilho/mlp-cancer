@@ -18,7 +18,7 @@ if __name__ == '__main__':
 	Pre-process
 	"""
 
-	base = Data('..\mammography-consolidated.csv',verbose=verbose)
+	base = Data(os.path.join('..', 'mammography-consolidated.csv'),verbose=verbose)
 	training, validation, testing = base.split()
 
 	"""
@@ -99,7 +99,7 @@ if __name__ == '__main__':
 				for opt_actvfunc in activation_function_options:
 					configDesc['activation_function_options'] = ''
 					configDesc['activation_function_options'] = opt_actvfunc
-					configDir = mydir + '\config_' + str(nConfig)
+					configDir = os.path.join(mydir, 'config_' + str(nConfig))
 					os.makedirs(configDir)
 					config = Config(base, opt_learning, opt_top, opt_actvfunc, force_overfiting = False)
 
@@ -144,7 +144,7 @@ if __name__ == '__main__':
 					Metrics.plot_confusion_matrix(target, predictions, configDir)
 					Metrics.plot_mse_curve(np.array(error_train), np.array(error_valid), configDir)
 					Metrics.plot_roc_curve(target, predictions, configDir)
-					Metrics.saveConfig(configDir+'\config.txt', configDesc)
+					Metrics.saveConfig(os.path.join(configDir, 'config.txt'), configDesc)
 
 					print("acurracy:", ((len(base['testing']['data'])-errors)/len(base['testing']['data']))*100,'%')
 					print('errors',errors,'of', len(base['testing']['data']))
