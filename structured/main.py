@@ -7,6 +7,7 @@ from sknn.platform import cpu32, threading, threads4
 from sknn.mlp import Layer, Classifier
 import datetime
 import os, sys
+import math
 
 from metrics import Metrics
 
@@ -26,16 +27,16 @@ if __name__ == '__main__':
 	"""
 
 	#currently, only oversample
-	sampling_options = [Oversampling.Repeat]
-	#sampling_options = [Oversampling.Repeat, Oversampling.SmoteRegular]
+	# sampling_options = [Oversampling.Repeat]
+	sampling_options = [Oversampling.Repeat, Oversampling.SmoteRegular]
 
 	# learning_rule = stochastic gradient descent ('sgd'), 'momentum', 'nesterov', 'adadelta', 'adagrad', 'rmsprop'
 	learning_rule_options = ['momentum','sgd']
 	#learning_rule_options = ['sgd', 'momentum','rmsprop']
 
 	#following the SKNN docs
-	activation_function_options = ['Sigmoid']
-	#activation_function_options = ['Sigmoid', 'Rectifier','Tanh']
+	#activation_function_options = ['Sigmoid']
+	activation_function_options = ['Sigmoid', 'Rectifier','Tanh']
 
 	#activation_function_options = ['Rectifier', 'Sigmoid', 'Tanh', 'ExpLin']
 
@@ -44,22 +45,22 @@ if __name__ == '__main__':
 		[
 			{'name':'hidden', 'units':5}
 		],
-		#[
-		#	{'name':'hidden', 'units':20}
-		#],
-		# [
-		# 	{'name':'hidden1', 'units':5},
-		# 	{'name':'hidden2', 'units':2},
-		# ],
+		[
+			{'name':'hidden', 'units':20}
+		],
+		[
+			{'name':'hidden1', 'units':5},
+			{'name':'hidden2', 'units':2},
+		],
 		# [
 		# 	{'name':'hidden1', 'units':5},
 		# 	{'name':'hidden2', 'units':4},
 		# 	{'name':'hidden3', 'units':3}
 		# ],
-		# [
-		# 	{'name':'hidden1', 'units':50},
-		# 	{'name':'hidden2', 'units':30},
-		# ]
+		[
+			{'name':'hidden1', 'units':50},
+			{'name':'hidden2', 'units':30},
+		]
 
 	]
 	configDesc = {'opt_samp':'', 'opt_learning':'', 'activation_function_options':'', 'activation_function_options':'', 'topology_options':''}
@@ -91,6 +92,8 @@ if __name__ == '__main__':
 			"""
 		base = {'training':training, 'validation': validation, 'testing': testing}
 
+		config_results = []
+
 		for opt_learning in learning_rule_options:
 			configDesc['opt_learning'] = ''
 			configDesc['opt_learning'] = opt_learning
@@ -121,7 +124,7 @@ if __name__ == '__main__':
 					learning_rule = opt_learning,
 				    layers=layers,
 				    learning_rate=0.001,
-				    n_iter=10000,
+				    n_iter=10,
 				    valid_set=(base['validation']['data'],base['validation']['target']),
 				    callback={'on_epoch_finish': store_errors},
 				    verbose = verbose
@@ -130,7 +133,6 @@ if __name__ == '__main__':
 					nn.fit(base['training']['data'],base['training']['target'])
 
 					print('Testing')
-					errors = 0
 					predictions = np.squeeze(np.asarray(nn.predict(base['testing']['data'])))
 					target = base['testing']['target']
 
@@ -143,13 +145,18 @@ if __name__ == '__main__':
 					#predictionsForClass0 = np.array([],dtype=np.int32)
 					#predictionsForClass1 = np.array([],dtype=np.int32)
 
+					errors = 0
+					test_mse = 0
 					for predicted, obj in zip(predictions,base['testing']['target']):
-						result = predicted
+						predicted
 
-						if result != obj:
+						if predicted != obj:
 							# print(' error')
 							errors += 1
+							test_mse += math.pow(predicted-obj, 2)
 						
+					test_mse = test_mse/float(len(predictions))
+
 					#	if obj == 0:
 					#		targetByClass = np.vstack([targetByClass, [1,0]])
 					#		predictionsForClass0 = np.append(predictionsForClass0, predicted)
@@ -162,11 +169,28 @@ if __name__ == '__main__':
 					#targetByClass = np.delete(targetByClass, 0, 0)
 					#targetByClass = np.asarray(targetByClass)
 
-					Metrics.plot_confusion_matrix(target, predictions, configDir)
-					Metrics.plot_mse_curve(np.array(error_train), np.array(error_valid), configDir)
-					Metrics.plot_roc_curve(target, predictions, configDir)
-					Metrics.saveConfig(os.path.join(configDir, 'config.txt'), configDesc)
+					"""
+					PLOT AND CALCULATE METRICS
+					"""
 
-					print("acurracy:", ((len(base['testing']['data'])-errors)/len(base['testing']['data']))*100,'%')
+					#Confusion Matrix
+					confusion_matrix = Metrics.plot_confusion_matrix(target, predictions, configDir)
+
+					#MSE (Training and Validation)
+					Metrics.plot_mse_curve(np.array(error_train), np.array(error_valid), configDir)
+
+					#Area Under ROC Curve
+					roc_area = Metrics.plot_roc_curve(target, predictions, configDir)
+
+					#precision
+					acurracy = ((len(base['testing']['data'])-errors)/len(base['testing']['data']))*100
+
+					print("acurracy:", acurracy,'%')
 					print('errors',errors,'of', len(base['testing']['data']))
+					
+					current_config_result = {'config':configDesc, 'results':{'mse':test_mse,'confusion':confusion_matrix,'roc':roc_area,'precision':acurracy}}
+					config_results.append(current_config_result)
+
+					Metrics.saveConfig(os.path.join(configDir, 'config-results.txt'), current_config_result)
+
 					nConfig = nConfig+1
