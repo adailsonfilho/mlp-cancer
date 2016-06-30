@@ -31,6 +31,8 @@ class Metrics:
 		Metrics.save(title, path)
 		print('Confusion Matrix:')
 		print(cm)
+		
+		return cm.tolist()
 		# plt.show()
 
 	def plot_roc_curve(y_test, y_score, path, title='ROC Curve'):
@@ -52,6 +54,8 @@ class Metrics:
 		plt.ylabel('True Positive Rate')
 		plt.legend(loc="lower right")
 		Metrics.save(title, path)
+		
+		return roc_auc
 	    # plt.show()
 
 	def plot_mse_curve(error_train, error_valid, path, title='MSE Curve'):
