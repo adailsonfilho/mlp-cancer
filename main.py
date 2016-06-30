@@ -136,15 +136,6 @@ if __name__ == '__main__':
 					predictions = np.squeeze(np.asarray(nn.predict(base['testing']['data'])))
 					target = base['testing']['target']
 
-					print('testing set', base['testing']['target'])
-					print('predictions', predictions)
-
-					#targetClass0 = np.array([],dtype=np.int32)
-					#targetClass1 = np.array([],dtype=np.int32)
-					#targetByClass = np.array([0,0])
-					#predictionsForClass0 = np.array([],dtype=np.int32)
-					#predictionsForClass1 = np.array([],dtype=np.int32)
-
 					errors = 0
 					test_mse = 0
 					for predicted, obj in zip(predictions,base['testing']['target']):
@@ -156,18 +147,6 @@ if __name__ == '__main__':
 							test_mse += math.pow(predicted-obj, 2)
 						
 					test_mse = test_mse/float(len(predictions))
-
-					#	if obj == 0:
-					#		targetByClass = np.vstack([targetByClass, [1,0]])
-					#		predictionsForClass0 = np.append(predictionsForClass0, predicted)
-					#	else:
-					#		targetByClass = np.vstack([targetByClass, [0,1]])
-					#		predictionsForClass1 = np.append(predictionsForClass1, predicted)
-
-					#predictionsByClass = [predictionsForClass0,predictionsForClass1]
-
-					#targetByClass = np.delete(targetByClass, 0, 0)
-					#targetByClass = np.asarray(targetByClass)
 
 					"""
 					PLOT AND CALCULATE METRICS

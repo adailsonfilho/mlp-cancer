@@ -1,0 +1,1 @@
+{'results': {'precision': 90.27181688125894, 'mse': 0.09728183118741059, 'roc': 0.89012759485113935, 'confusion': [[2467, 264], [8, 57]]}, 'config': {'opt_learning': 'sgd', 'topology_options': [{'units': 50, 'name': 'hidden1'}, {'units': 30, 'name': 'hidden2'}], 'opt_samp': 'Repeat', 'activation_function_options': 'Tanh'}}
