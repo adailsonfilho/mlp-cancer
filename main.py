@@ -1,188 +1,196 @@
-#!/usr/bin/python
-#coding: utf-8
-import subprocess, os, sys
-import utils
 import numpy as np
-# import csv as libcsv
-# import ipdb
-import matplotlib.pyplot as plt
-# Use the CPU in 64-bit mode.
-# from sknn.platform import cpu64
+from preprocess import Data
+from config import Config
+from oversampler import Oversampler
+from enums import Oversampling
 from sknn.platform import cpu32, threading, threads4
 from sknn.mlp import Layer, Classifier
-from sklearn.metrics import confusion_matrix
-# from sklearn.neural_network import MLPClassifier
-from unbalanced_dataset.over_sampling import SMOTE
+import datetime
+import os, sys
+import math
 
-#Save same output to file
-# tee = subprocess.Popen(["tee", os.path.join('results', 'log.txt')], stdin=subprocess.PIPE)
-# os.dup2(tee.stdin.fileno(), sys.stdout.fileno())
-# os.dup2(tee.stdin.fileno(), sys.stderr.fileno())
-
-#create needed folder
-# if not os.path.exists('results'):
-# 	os.makedirs('results')
+from metrics import Metrics
 
 if __name__ == '__main__':
 
-	'''PRE PROCESSING'''
+	verbose = True
 
-	#READ
-	classe0 = []
-	classe1 = []
+	"""
+	Pre-process
+	"""
 
-	with open('mammography-consolidated.csv', 'r') as csv:
-	    for line in csv:
-	    	line_ = [ float(val) for val in line.split(',')]
+	base = Data('mammography-consolidated.csv', verbose=verbose)
+	training, validation, testing = base.split()
 
-	    	#for separeted data
-	    	if line_[-1] == 0:
-	    		classe0.append(line_)
-	    	elif line_[-1] == 1:
-	    		classe1.append(line_)
+	"""
+	Setup experiment config
+	"""
 
-	classe0 = np.array(classe0)
-	classe1 = np.array(classe1)
+	#currently, only oversample
+	# sampling_options = [Oversampling.Repeat]
+	sampling_options = [Oversampling.Repeat, Oversampling.SmoteRegular]
 
-	print('Classe 0 size:',len(classe0))
-	print('Classe 1 size:',len(classe1))
+	# learning_rule = stochastic gradient descent ('sgd'), 'momentum', 'nesterov', 'adadelta', 'adagrad', 'rmsprop'
+	learning_rule_options = ['momentum','sgd']
+	#learning_rule_options = ['sgd', 'momentum','rmsprop']
 
-	#randomize classe 0
-	np.random.shuffle(classe0)
+	#following the SKNN docs
+	#activation_function_options = ['Sigmoid']
+	activation_function_options = ['Sigmoid', 'Rectifier','Tanh']
 
-    #randomize classe 1
-	np.random.shuffle(classe1)
+	#activation_function_options = ['Rectifier', 'Sigmoid', 'Tanh', 'ExpLin']
 
-##################################################################################
+	#based on W.I.W.T. - What I Want To
+	topology_options = [
+		[
+			{'name':'hidden', 'units':5}
+		],
+		[
+			{'name':'hidden', 'units':20}
+		],
+		[
+			{'name':'hidden1', 'units':5},
+			{'name':'hidden2', 'units':2},
+		],
+		# [
+		# 	{'name':'hidden1', 'units':5},
+		# 	{'name':'hidden2', 'units':4},
+		# 	{'name':'hidden3', 'units':3}
+		# ],
+		[
+			{'name':'hidden1', 'units':50},
+			{'name':'hidden2', 'units':30},
+		]
 
-	#Preparando conjunto de treinamento - 50%
-	halfx = int((len(classe0)*.5))
-	halfy = int((len(classe1)*.5))
-
-	trainingsetx = classe0[:halfx, :-1]
-	trainingsety = classe1[:halfy, :-1]
-
-	data = np.concatenate((trainingsetx,trainingsety))
-	target = np.concatenate((classe0[:halfx,-1],classe1[:halfy,-1])).astype(int)
-
-	print('>> Training')
-
-	print('Classe 0 training size:',len(trainingsetx))
-	print('Classe 1 training size:',len(trainingsety))
-
-	'''OVERSAMPLING'''
-
-#	Oversampling por SMOTE
-	sm = SMOTE(kind='regular', verbose=True)
-	balancedTrainingSetData,balancedTrainingSetTarget = sm.fit_transform(data, target)
-	
-#	Oversampling por repetição simples
-	# balancedTrainingSetData = np.concatenate((trainingsetx,trainingsety.repeat(42, axis=0)))
-	# balancedTrainingSetTarget = np.concatenate((classe0[:halfx,-1],classe1[:halfy,-1].repeat(42, axis=0))).astype(int)	
-
-	print('Balanced training size:',len(balancedTrainingSetData))
-	print('Balanced training data shape:',balancedTrainingSetData.shape)
-	print('Balanced training target shape:',balancedTrainingSetTarget.shape)
-
-# ######################################################################################
-
-# 	#Primeiro quarto - conjunto de validação - 25%
-	quarter1x = int((len(classe0)*.75))
-	quarter1y = int((len(classe1)*.75))
-
-	validationsetx = classe0[halfx:quarter1x,:-1]
-	validationsety = classe1[halfy:quarter1y,:-1]
-
-	data = np.concatenate((validationsetx,validationsety))
-	target = np.concatenate((classe0[halfx:quarter1x,-1],classe1[halfy:quarter1y,-1])).astype(int)
-
-	print('>> Validation size:',len(data))
-
-	'''OVERSAMPLING'''
-	
-	sm = SMOTE(kind='regular')
-	balancedValidationSetData, balancedValidationSetTarget = sm.fit_transform(data, target)
-
-#	Oversampling por repetição simples
-	# balancedValidationSetData = np.concatenate((validationsetx,validationsety.repeat(42, axis=0)))
-	# balancedValidationSetTarget = np.concatenate((classe0[halfx:quarter1x,-1],classe1[halfy:quarter1y,-1].repeat(42, axis=0))).astype(int)
-
-	print('Balanced validation size:',len(balancedValidationSetData))
-	print('Balanced validation data shape:',balancedValidationSetData.shape)
-	print('Balanced validation target shape:',balancedValidationSetTarget.shape)
-
-# #######################################################################################
-
-# 	#Segundo quarto - conjunto de teste - 25%
-	testsetx = classe0[quarter1x:,:-1]
-	testsety = classe1[quarter1y:,:-1]
-
-	data = np.concatenate((testsetx,testsety))
-	target = np.concatenate((classe0[quarter1x:,-1],classe1[quarter1y:,-1])).astype(int)
-
-	print('>> Test')
-	print('Classe 0 test size:',len(testsetx))
-	print('Classe 1 test size:',len(testsety))
-
-	print('Balanced test size:',len(data))
-
-	'''LEARNING'''
-	layers = [
-		Layer(type='Sigmoid',name="hidden_layer_1",units=5),
-		#Layer(type='Sigmoid',name="hidden_layer_2",units=2),
-		Layer(type='Softmax',name="output_layer")
 	]
+	configDesc = {'opt_samp':'', 'opt_learning':'', 'activation_function_options':'', 'activation_function_options':'', 'topology_options':''}
+	nConfig = 0
+	#Create folder with timestamp
+	mydir = os.path.join(os.getcwd(), datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
+	os.makedirs(mydir)
 
+	for opt_samp in sampling_options:
 
-	error_train = []
-	error_valid = []
+		if opt_samp != Oversampling.DontUse:
+			configDesc['opt_samp'] = ''
+			configDesc['opt_samp'] = opt_samp.name
 
-	def store_errors(avg_valid_error, avg_train_error, **_):
-		error_train.append(avg_valid_error)
-		error_valid.append(avg_train_error)
+			"""
+			TRAINING OVER SAMPLE
+			"""
+			oversampler = Oversampler(opt_samp, training['data'], training['target'], True)
+			training['data'], training['target'] = oversampler.balance()
 
-	print('Initializing cliassifier')
-	
-	nn = Classifier(
-	    layers=layers,
-	    learning_rate=0.01,
-	    n_iter=1000,
-	    valid_set=(balancedValidationSetData,balancedValidationSetTarget),
-	    callback={'on_epoch_finish': store_errors},
-	    verbose = True
-	    )
-	
-	print('Fitting')
-	nn.fit(balancedTrainingSetData,balancedTrainingSetTarget)
-	#score = nn.score(balancedValidationSetData,balancedValidationSetTarget)
+			"""
+			VALIDATION OVER SAMPLE
+			"""
+			oversampler = Oversampler(opt_samp,validation['data'], validation['target'],True )
+			validation['data'], validation['target'] = oversampler.balance()
 
-	print('Testing')
-	errors = 0
+			"""
+			DO NOT MAKE SENSE OVERSAMPLING OF TESTING SET
+			"""
+		base = {'training':training, 'validation': validation, 'testing': testing}
 
-	print(data)
-	predictions = np.squeeze(np.asarray(nn.predict(data)))
+		config_results = []
 
-	for predicted,obj in zip(predictions,target):
+		for opt_learning in learning_rule_options:
+			configDesc['opt_learning'] = ''
+			configDesc['opt_learning'] = opt_learning
+			for opt_top in topology_options:
+				configDesc['topology_options'] = ''
+				configDesc['topology_options'] = opt_top
+				for opt_actvfunc in activation_function_options:
+					configDesc['activation_function_options'] = ''
+					configDesc['activation_function_options'] = opt_actvfunc
+					configDir = os.path.join(mydir, 'config_' + str(nConfig))
+					os.makedirs(configDir)
+					config = Config(base, opt_learning, opt_top, opt_actvfunc, force_overfiting = False)
 
-		result = predicted
+					#data storing for charts
+					error_train = []
+					error_valid = []
 
-		#print(result, obj,end='')
-		if result != obj:
-			print(' error')
-			errors += 1
-		print()
+					def store_errors(avg_valid_error, avg_train_error, **_):
+						error_train.append(avg_valid_error)
+						error_valid.append(avg_train_error)
 
-	# plt.plot(error_train, error_valid)
-	# #utils.save('test')
-	# plt.show()
+					'''LEARNING'''
 
-	utils.plot_confusion_matrix(confusion_matrix(target, predictions))
-	utils.plot_mse_curve(np.array(error_train), np.array(error_valid))
-	utils.plot_roc_curve(target, predictions)
+					layers = [Layer(type=opt_actvfunc,name=topology['name'],units=topology['units']) for topology in opt_top];
+					layers.append(Layer(type='Softmax',name="output_layer"))
 
-	print("acurracy:", ((len(data)-errors)/len(data))*100,'%')
-	print('errors',errors,'of', len(data))
+					nn = Classifier(
+					learning_rule = opt_learning,
+				    layers=layers,
+				    learning_rate=0.001,
+				    n_iter=10,
+				    valid_set=(base['validation']['data'],base['validation']['target']),
+				    callback={'on_epoch_finish': store_errors},
+				    verbose = verbose
+				    )
 
+					nn.fit(base['training']['data'],base['training']['target'])
 
-# 	# clf = MLPClassifier(algorithm='l-bfgs', alpha=1e-5, hidden_layer_sizes=(5, 1), random_state=1, shuffle=True)
-# 	# clf.fit(classe0, classe1)
+					print('Testing')
+					predictions = np.squeeze(np.asarray(nn.predict(base['testing']['data'])))
+					target = base['testing']['target']
+
+					print('testing set', base['testing']['target'])
+					print('predictions', predictions)
+
+					#targetClass0 = np.array([],dtype=np.int32)
+					#targetClass1 = np.array([],dtype=np.int32)
+					#targetByClass = np.array([0,0])
+					#predictionsForClass0 = np.array([],dtype=np.int32)
+					#predictionsForClass1 = np.array([],dtype=np.int32)
+
+					errors = 0
+					test_mse = 0
+					for predicted, obj in zip(predictions,base['testing']['target']):
+						predicted
+
+						if predicted != obj:
+							# print(' error')
+							errors += 1
+							test_mse += math.pow(predicted-obj, 2)
+						
+					test_mse = test_mse/float(len(predictions))
+
+					#	if obj == 0:
+					#		targetByClass = np.vstack([targetByClass, [1,0]])
+					#		predictionsForClass0 = np.append(predictionsForClass0, predicted)
+					#	else:
+					#		targetByClass = np.vstack([targetByClass, [0,1]])
+					#		predictionsForClass1 = np.append(predictionsForClass1, predicted)
+
+					#predictionsByClass = [predictionsForClass0,predictionsForClass1]
+
+					#targetByClass = np.delete(targetByClass, 0, 0)
+					#targetByClass = np.asarray(targetByClass)
+
+					"""
+					PLOT AND CALCULATE METRICS
+					"""
+
+					#Confusion Matrix
+					confusion_matrix = Metrics.plot_confusion_matrix(target, predictions, configDir)
+
+					#MSE (Training and Validation)
+					Metrics.plot_mse_curve(np.array(error_train), np.array(error_valid), configDir)
+
+					#Area Under ROC Curve
+					roc_area = Metrics.plot_roc_curve(target, predictions, configDir)
+
+					#precision
+					acurracy = ((len(base['testing']['data'])-errors)/len(base['testing']['data']))*100
+
+					print("acurracy:", acurracy,'%')
+					print('errors',errors,'of', len(base['testing']['data']))
+					
+					current_config_result = {'config':configDesc, 'results':{'mse':test_mse,'confusion':confusion_matrix,'roc':roc_area,'precision':acurracy}}
+					config_results.append(current_config_result)
+
+					Metrics.saveConfig(os.path.join(configDir, 'config-results.json'), current_config_result)
+
+					nConfig = nConfig+1
