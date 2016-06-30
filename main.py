@@ -31,12 +31,12 @@ if __name__ == '__main__':
 	sampling_options = [Oversampling.Repeat, Oversampling.SmoteRegular]
 
 	# learning_rule = stochastic gradient descent ('sgd'), 'momentum', 'nesterov', 'adadelta', 'adagrad', 'rmsprop'
-	learning_rule_options = ['momentum','sgd']
+	learning_rule_options = ['momentum', 'sgd']
 	#learning_rule_options = ['sgd', 'momentum','rmsprop']
 
 	#following the SKNN docs
 	#activation_function_options = ['Sigmoid']
-	activation_function_options = ['Sigmoid', 'Rectifier','Tanh']
+	activation_function_options = ['Sigmoid', 'Rectifier', 'Tanh']
 
 	#activation_function_options = ['Rectifier', 'Sigmoid', 'Tanh', 'ExpLin']
 
@@ -52,23 +52,25 @@ if __name__ == '__main__':
 			{'name':'hidden1', 'units':5},
 			{'name':'hidden2', 'units':2},
 		],
-		# [
-		# 	{'name':'hidden1', 'units':5},
-		# 	{'name':'hidden2', 'units':4},
-		# 	{'name':'hidden3', 'units':3}
-		# ],
+		[
+			{'name':'hidden1', 'units':5},
+			{'name':'hidden2', 'units':4},
+			{'name':'hidden3', 'units':3}
+		],
 		[
 			{'name':'hidden1', 'units':50},
 			{'name':'hidden2', 'units':30},
 		]
-
 	]
+	
 	configDesc = {'opt_samp':'', 'opt_learning':'', 'activation_function_options':'', 'activation_function_options':'', 'topology_options':''}
 	nConfig = 0
+	
 	#Create folder with timestamp
 	mydir = os.path.join(os.getcwd(), datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
 	os.makedirs(mydir)
 
+	config_results = []
 	for opt_samp in sampling_options:
 
 		if opt_samp != Oversampling.DontUse:
@@ -91,8 +93,6 @@ if __name__ == '__main__':
 			DO NOT MAKE SENSE OVERSAMPLING OF TESTING SET
 			"""
 		base = {'training':training, 'validation': validation, 'testing': testing}
-
-		config_results = []
 
 		for opt_learning in learning_rule_options:
 			configDesc['opt_learning'] = ''
@@ -194,3 +194,10 @@ if __name__ == '__main__':
 					Metrics.saveConfig(os.path.join(configDir, 'config-results.json'), current_config_result)
 
 					nConfig = nConfig+1
+		
+	text = 'var configs = ['
+	for config in config_results[:-1]:
+		text += str(config) + ','
+	
+	text += str(config_results[-1]) + '];'
+	Metrics.saveConfig('config.js', text)
