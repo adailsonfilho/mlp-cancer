@@ -18,7 +18,9 @@ Object.prototype.toHtml = function(cls='none', confNum) {
 	var htmlStr = '';
 	if (cls !== 'none') {
 	    htmlStr = '<div id="' + 'config_' + confNum + '" class="panel panel-default ' + (cls || '') + '">';
-	    htmlStr = htmlStr + '<div class="panel-heading">' + 'Config ' + confNum + '</div>';
+	    htmlStr = htmlStr + '<div class="panel-heading">' + '<h4>Config ' + confNum +
+	            '<button type="button" class="btn btn-success mLeft10 btn-sm mBottom10 pull-right" onClick="showIt(' + confNum + ')">Show Results</button>'
+	                + '</h4></div>';
 	    htmlStr = htmlStr + '<div class="panel-body">';
 	}
 
@@ -74,6 +76,31 @@ Object.prototype.toHtml = function(cls='none', confNum) {
 	
 	return htmlStr;
 };
+
+/**
+ * Show a modal with configuration curves
+ * @param confNum: the configuration number
+ */
+function showIt(confNum) {
+    var modalTemplate = function(confNum) {
+        var result = '<div> ';
+        
+        result = result + '<img src="latest/config_' + confNum + '/Confusion matrix.png"/>';
+        result = result + '<img src="latest/config_' + confNum + '/MSE Curve.png"/>';
+        result = result + '<img src="latest/config_' + confNum + '/ROC Curve.png"/>';
+        
+        return result + '</div>';
+    };
+    
+    // title
+    $('#modal-title').text('Config ' + confNum);
+    
+    // content (curves)
+    $('#modal-content').html(modalTemplate(confNum));
+    
+    // show
+    $("#myModal").modal();
+}
 
 /**
  * Responsável por 'pendurar'dados no HTML

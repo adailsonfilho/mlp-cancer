@@ -8,6 +8,7 @@ from sknn.mlp import Layer, Classifier
 import datetime
 import os, sys
 import math
+import shutil
 
 from metrics import Metrics
 
@@ -27,7 +28,7 @@ if __name__ == '__main__':
 	"""
 
 	#currently, only oversample
-	# sampling_options = [Oversampling.Repeat]
+	#sampling_options = [Oversampling.Repeat]
 	sampling_options = [Oversampling.Repeat, Oversampling.SmoteRegular]
 
 	# learning_rule = stochastic gradient descent ('sgd'), 'momentum', 'nesterov', 'adadelta', 'adagrad', 'rmsprop'
@@ -68,9 +69,15 @@ if __name__ == '__main__':
 	
 	#Create folder with timestamp
 	mydir = os.path.join(os.getcwd(), datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
+	latest = os.path.join(os.getcwd(), 'latest')
+	
+	if (os.path.exists(latest)):
+		shutil.rmtree(latest)
+		
 	os.makedirs(mydir)
 
 	config_results = []
+	configDir = ''
 	for opt_samp in sampling_options:
 
 		if opt_samp != Oversampling.DontUse:
@@ -197,7 +204,13 @@ if __name__ == '__main__':
 		
 	text = 'var configs = ['
 	for config in config_results[:-1]:
+		print(config + '\n')
 		text += str(config) + ','
 	
 	text += str(config_results[-1]) + '];'
+	
+	if (os.path.exists('config.js')):
+		os.remove('config.js')
+	
 	Metrics.saveConfig('config.js', text)
+	Metrics.copyDirectory(mydir, latest)
