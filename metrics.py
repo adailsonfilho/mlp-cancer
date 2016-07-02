@@ -12,6 +12,7 @@ from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
 from sklearn import cross_validation
 from sklearn.metrics import confusion_matrix
+import shutil
 
 class Metrics:
 
@@ -50,6 +51,7 @@ class Metrics:
 		plt.plot([0, 1], [0, 1], 'k--')
 		plt.xlim([0.0, 1.0])
 		plt.ylim([0.0, 1.05])
+		plt.title(title)
 		plt.xlabel('False Positive Rate')
 		plt.ylabel('True Positive Rate')
 		plt.legend(loc="lower right")
@@ -59,6 +61,7 @@ class Metrics:
 	    # plt.show()
 
 	def plot_mse_curve(error_train, error_valid, path, title='MSE Curve'):
+		plt.title(title)
 	    plt.plot(error_train,label="MSE - Training")
 	    plt.plot(error_valid,label="MSE - Validation")
 	    plt.legend(loc="best")
@@ -96,3 +99,12 @@ class Metrics:
 		with open(path, 'w') as output:
 			output.write(str(config))
 			
+	def copyDirectory(src, dest):
+	    try:
+	        shutil.copytree(src, dest)
+	    # Directories are the same
+	    except shutil.Error as e:
+	        print('Directory not copied. Error: %s' % e)
+	    # Any error saying that the directory doesn't exist
+	    except OSError as e:
+	        print('Directory not copied. Error: %s' % e)
