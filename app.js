@@ -1,20 +1,4 @@
 /**
- * Configs aqui
- * 
- * Colocar todas semapradas por vírgula.
- * Apenas copiar e colar dos arquivos.
- */
-var configs = [
-    {'config': {'opt_samp': 'Repeat', 'opt_learning': 'momentum', 'activation_function_options': 'Sigmoid', 'topology_options': [{'units': 5, 'name': 'hidden'}]}, 'results': {'roc': 0.88317325296453819, 'precision': 87.44635193133047, 'confusion': [[2387, 344], [7, 58]], 'mse': 0.1255364806866953}},
-    {'config': {'opt_samp': 'Repeat', 'opt_learning': 'momentum', 'activation_function_options': 'Rectifier', 'topology_options': [{'units': 5, 'name': 'hidden'}]}, 'results': {'roc': 0.88774751429456666, 'precision': 89.8068669527897, 'confusion': [[2454, 277], [8, 57]], 'mse': 0.10193133047210301}}
-];
-
-
-
-
-
-
-/**
  * Usado para formatar números na matriz de confusão
  * @param pad: o formato ta string de dígitos (em zeros)
  */
