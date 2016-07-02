@@ -42,6 +42,13 @@ Object.prototype.toHtml = function(cls='none', confNum) {
 						    
 						    htmlStr = htmlStr + '<p><code>| ' + db[key][1][0].toDigits('0000')
     					        + ' ' + db[key][1][1].toDigits('0000') + ' |</code></p>';
+    					} else if (key === 'topology_options') {
+    					    db[key].forEach(
+        						function(k) {
+        							htmlStr = htmlStr + '<p>name: <code>' + k.name + 
+        								'</code> units: <code>' + k.units + '</code></p>';
+        						}
+        					);
     					} else {
     					    db[key].forEach(
         						function(k) {
