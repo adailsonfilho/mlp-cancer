@@ -89,6 +89,108 @@ function appendObject(id, obj, index) {
     target.removeChild(div);
 }
 
+/**
+ * Clones an object
+ */
+function clone(obj) {
+    var copy;
+
+    // Handle the 3 simple types, and null or undefined
+    if (null == obj || "object" != typeof obj) return obj;
+
+    // Handle Date
+    if (obj instanceof Date) {
+        copy = new Date();
+        copy.setTime(obj.getTime());
+        return copy;
+    }
+
+    // Handle Array
+    if (obj instanceof Array) {
+        copy = [];
+        for (var i = 0, len = obj.length; i < len; i++) {
+            copy[i] = clone(obj[i]);
+        }
+        return copy;
+    }
+
+    // Handle Object
+    if (obj instanceof Object) {
+        copy = {};
+        for (var attr in obj) {
+            if (obj.hasOwnProperty(attr)) copy[attr] = clone(obj[attr]);
+        }
+        return copy;
+    }
+
+    throw new Error("Unable to copy obj! Its type isn't supported.");
+}
+
+/**
+ * compute responses to create data for chart
+ * @param field: the field of the chart
+ */
+function setData(field) {
+   var result = [];
+   
+   // random number
+   var num = function(min, max) {
+       if ((min !== undefined) && (max !== undefined)) {
+           return Math.floor(Math.random() * (max - min + 1)) + min;
+       } else {
+           return num(0, 100);
+       }
+   };
+   
+   // random color (with alpha)
+   var color = function(alpha) {
+       return "rgba(" + num(0, 254) + "," + num(0, 254) + "," + num(0, 254) + "," + alpha + ")";
+   };
+   
+   // colorize a template
+   var colorize = function(t) {
+       var c = color(1);
+       
+       t.borderColor = c;
+       t.pointBackgroundColor = c;
+       t.pointHoverBorderColor = c;
+       
+       t.backgroundColor = c.replace(',1)', ',0.2)');
+       
+       return t;
+   };
+   
+   // template for graph
+   var template = {
+       label: "",
+       backgroundColor: "rgba(179,181,198,0.2)",
+       borderColor: "rgba(179,181,198,1)",
+       pointBackgroundColor: "rgba(179,181,198,1)",
+       pointBorderColor: "#fff",
+       pointHoverBackgroundColor: "#fff",
+       pointHoverBorderColor: "rgba(179,181,198,1)",
+       data: []
+   };
+   
+   // put responses into dataset
+   Object.keys(configs.map(function(config) {
+   		return config['results'];
+   })).forEach(
+        function(response) {
+            result.push(colorize(clone(template)));
+            result[result.length - 1].label = 'Config ' + response;
+            
+            // ["Precision", "Final MSE", "ROC Area", "Confusion"]
+            result[result.length - 1].data = [
+                configs[response]['results'][field]
+                //configs[response]['results'].mse,
+                //configs[response]['results'].roc,
+                //configs[response]['results'].confusion[0][0]
+            ];
+    });
+    return result;
+}
+
 
 
 
@@ -101,3 +203,65 @@ configs.map(function(obj) {
         appendObject('main', config, index);
     }
 );
+
+// the data of the charts
+var precisionData = {
+    //labels: ["Precision", "Final MSE", "ROC Area", "Confusion"],
+    labels: ["Precision"],
+    datasets: setData('precision')
+};
+
+var mseData = {
+    //labels: ["Precision", "Final MSE", "ROC Area", "Confusion"],
+    labels: ["Final MSE"],
+    datasets: setData('mse')
+};
+
+var rocData = {
+    //labels: ["Precision", "Final MSE", "ROC Area", "Confusion"],
+    labels: ["ROC Area"],
+    datasets: setData('roc')
+};
+
+// create charts
+var ctx = document.getElementById("graph-precision");
+new Chart(ctx, {
+    type: "bar",
+    data: precisionData,
+    options: {
+        scales: {
+            reverse: false,
+            ticks: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+var ctx = document.getElementById("graph-mse");
+new Chart(ctx, {
+    type: "bar",
+    data: mseData,
+    options: {
+        scales: {
+            reverse: false,
+            ticks: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+var ctx = document.getElementById("graph-roc");
+new Chart(ctx, {
+    type: "bar",
+    data: rocData,
+    options: {
+        scales: {
+            reverse: false,
+            ticks: {
+                beginAtZero: true
+            }
+        }
+    }
+});
