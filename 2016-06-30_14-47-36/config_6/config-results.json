@@ -1,1 +1,0 @@
-{'results': {'precision': 90.66523605150213, 'mse': 0.09334763948497854, 'roc': 0.88463228459566801, 'confusion': [[2479, 252], [9, 56]]}, 'config': {'opt_learning': 'momentum', 'topology_options': [{'units': 5, 'name': 'hidden1'}, {'units': 2, 'name': 'hidden2'}], 'opt_samp': 'Repeat', 'activation_function_options': 'Sigmoid'}}

@@ -1,1 +1,0 @@
-{'results': {'precision': 89.30615164520745, 'mse': 0.10693848354792561, 'roc': 0.87767512604568632, 'confusion': [[2441, 290], [9, 56]]}, 'config': {'opt_learning': 'sgd', 'topology_options': [{'units': 5, 'name': 'hidden1'}, {'units': 2, 'name': 'hidden2'}], 'opt_samp': 'SmoteRegular', 'activation_function_options': 'Sigmoid'}}

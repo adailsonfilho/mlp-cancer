@@ -1,1 +1,0 @@
-{'results': {'precision': 91.23748211731044, 'mse': 0.08762517882689556, 'roc': 0.88756161451144977, 'confusion': [[2495, 236], [9, 56]]}, 'config': {'opt_learning': 'momentum', 'topology_options': [{'units': 20, 'name': 'hidden'}], 'opt_samp': 'Repeat', 'activation_function_options': 'Tanh'}}

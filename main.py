@@ -2,7 +2,9 @@ import numpy as np
 from preprocess import Data
 from config import Config
 from oversampler import Oversampler
+from undersampler import Undersampler
 from enums import Oversampling
+from enums import Undersampling
 from sknn.platform import cpu32, threading, threads4
 from sknn.mlp import Layer, Classifier
 import datetime
@@ -26,17 +28,20 @@ if __name__ == '__main__':
 	Setup experiment config
 	"""
 
-	#currently, only oversample
-	# sampling_options = [Oversampling.Repeat]
-	sampling_options = [Oversampling.Repeat, Oversampling.SmoteRegular]
+	#undersampling
+	sampling_options = [Undersampling.ClusterCentroids, Undersampling.SMOTEENN]
+
+	#oversampling
+	#sampling_options = [Oversampling.Repeat]
+	#sampling_options = [Oversampling.Repeat, Oversampling.SmoteRegular]
 
 	# learning_rule = stochastic gradient descent ('sgd'), 'momentum', 'nesterov', 'adadelta', 'adagrad', 'rmsprop'
 	learning_rule_options = ['momentum', 'sgd']
 	#learning_rule_options = ['sgd', 'momentum','rmsprop']
 
 	#following the SKNN docs
-	#activation_function_options = ['Sigmoid']
-	activation_function_options = ['Sigmoid', 'Rectifier', 'Tanh']
+	activation_function_options = ['Sigmoid']
+	#activation_function_options = ['Sigmoid', 'Rectifier', 'Tanh']
 
 	#activation_function_options = ['Rectifier', 'Sigmoid', 'Tanh', 'ExpLin']
 
@@ -80,14 +85,18 @@ if __name__ == '__main__':
 			"""
 			TRAINING OVER SAMPLE
 			"""
-			oversampler = Oversampler(opt_samp, training['data'], training['target'], True)
-			training['data'], training['target'] = oversampler.balance()
+			#oversampler = Oversampler(opt_samp, training['data'], training['target'], True)
+			#training['data'], training['target'] = oversampler.balance()
+			undersampler = Undersampler(opt_samp, training['data'], training['target'], True)
+			training['data'], training['target'] = undersampler.balance()
 
 			"""
 			VALIDATION OVER SAMPLE
 			"""
-			oversampler = Oversampler(opt_samp,validation['data'], validation['target'],True )
-			validation['data'], validation['target'] = oversampler.balance()
+			#oversampler = Oversampler(opt_samp,validation['data'], validation['target'],True)
+			#validation['data'], validation['target'] = oversampler.balance()
+			undersampler = Undersampler(opt_samp,validation['data'], validation['target'],True)
+			validation['data'], validation['target'] = undersampler.balance()
 
 			"""
 			DO NOT MAKE SENSE OVERSAMPLING OF TESTING SET
@@ -154,6 +163,7 @@ if __name__ == '__main__':
 
 					#Confusion Matrix
 					confusion_matrix = Metrics.plot_confusion_matrix(target, predictions, configDir)
+					confusion_matrix_percentage = np.round(np.multiply(np.divide(confusion_matrix, np.array([target.size])),np.array([100])),2).tolist()
 
 					#MSE (Training and Validation)
 					Metrics.plot_mse_curve(np.array(error_train), np.array(error_valid), configDir)
@@ -167,7 +177,8 @@ if __name__ == '__main__':
 					print("acurracy:", acurracy,'%')
 					print('errors',errors,'of', len(base['testing']['data']))
 					
-					current_config_result = {'config':configDesc, 'results':{'mse':test_mse,'confusion':confusion_matrix,'roc':roc_area,'precision':acurracy}}
+					current_config_result = {'config':configDesc, 'results':{'mse':test_mse,'confusion':confusion_matrix_percentage
+					,'roc':roc_area,'precision':acurracy}}
 					config_results.append(current_config_result)
 
 					Metrics.saveConfig(os.path.join(configDir, 'config-results.json'), current_config_result)

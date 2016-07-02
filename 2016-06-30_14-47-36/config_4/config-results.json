@@ -1,1 +1,0 @@
-{'results': {'precision': 91.05865522174535, 'mse': 0.08941344778254649, 'roc': 0.88664619891276808, 'confusion': [[2490, 241], [9, 56]]}, 'config': {'opt_learning': 'momentum', 'topology_options': [{'units': 20, 'name': 'hidden'}], 'opt_samp': 'Repeat', 'activation_function_options': 'Rectifier'}}

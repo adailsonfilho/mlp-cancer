@@ -1,1 +1,0 @@
-{'results': {'precision': 91.66666666666666, 'mse': 0.08333333333333333, 'roc': 0.88975861194828609, 'confusion': [[2507, 224], [9, 56]]}, 'config': {'opt_learning': 'sgd', 'topology_options': [{'units': 20, 'name': 'hidden'}], 'opt_samp': 'SmoteRegular', 'activation_function_options': 'Rectifier'}}

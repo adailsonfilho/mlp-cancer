@@ -1,4 +1,4 @@
-from unbalanced_dataset.over_sampling import SMOTE
+from imblearn.over_sampling import SMOTE
 from enums import Oversampling
 import numpy as np
 # import ipdb
@@ -74,7 +74,7 @@ class Oversampler:
 
 			# Oversampling por SMOTE
 			self.oversampler = SMOTE(kind=smotekind, verbose = verbose, ratio=ratio)
-		elif kind in [ Oversampling.Repeat]:
+		elif kind in [Oversampling.Repeat]:
 			if verbose: print('> REPEATER')
 			self.oversampler = Repeater(verbose = verbose)
 

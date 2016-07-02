@@ -1,1 +1,0 @@
-{'results': {'precision': 89.55650929899856, 'mse': 0.1044349070100143, 'roc': 0.87895670788384084, 'confusion': [[2448, 283], [9, 56]]}, 'config': {'opt_learning': 'sgd', 'topology_options': [{'units': 20, 'name': 'hidden'}], 'opt_samp': 'Repeat', 'activation_function_options': 'Tanh'}}
