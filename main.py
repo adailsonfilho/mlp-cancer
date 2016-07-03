@@ -58,15 +58,15 @@ if __name__ == '__main__':
 			{'name':'hidden1', 'units':5},
 			{'name':'hidden2', 'units':2},
 		],
-		[
-			{'name':'hidden1', 'units':5},
-			{'name':'hidden2', 'units':4},
-			{'name':'hidden3', 'units':3}
-		],
-		[
-			{'name':'hidden1', 'units':50},
-			{'name':'hidden2', 'units':30},
-		]
+		#[
+		#	{'name':'hidden1', 'units':5},
+		#	{'name':'hidden2', 'units':4},
+		#	{'name':'hidden3', 'units':3}
+		#],
+		#[
+		#	{'name':'hidden1', 'units':50},
+		#	{'name':'hidden2', 'units':30},
+		#]
 	]
 	
 	configDesc = {'opt_samp':'', 'opt_learning':'', 'activation_function_options':'', 'activation_function_options':'', 'topology_options':''}
@@ -183,7 +183,7 @@ if __name__ == '__main__':
 
 					print("acurracy:", acurracy,'%')
 					print('errors',errors,'of', len(base['testing']['data']))
-					
+
 					current_config_result = {'config':configDesc, 'results':{'mse':test_mse,'confusion':confusion_matrix_percentage
 					,'roc':roc_area,'precision':acurracy}}
 					config_results.append(current_config_result)
@@ -191,14 +191,14 @@ if __name__ == '__main__':
 					Metrics.saveConfig(os.path.join(configDir, 'config-results.json'), current_config_result)
 
 					nConfig = nConfig+1
-		
+					current_config_result = {}
+	
 	text = 'var configs = ['
 	for config in config_results[:-1]:
-		print(config + '\n')
 		text += str(config) + ','
 	
 	text += str(config_results[-1]) + '];'
-	
+
 	if (os.path.exists('config.js')):
 		os.remove('config.js')
 	

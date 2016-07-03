@@ -1,0 +1,1 @@
+{'config': {'activation_function_options': 'Sigmoid', 'opt_samp': 'ClusterCentroids', 'topology_options': [{'units': 5, 'name': 'hidden1'}, {'units': 2, 'name': 'hidden2'}], 'opt_learning': 'momentum'}, 'results': {'precision': 94.09871244635193, 'mse': 0.059012875536480686, 'confusion': [[92.13, 5.54], [0.36, 1.97]], 'roc': 0.89469903951778729}}

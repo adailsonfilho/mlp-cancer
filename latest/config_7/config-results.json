@@ -1,0 +1,1 @@
+{'config': {'activation_function_options': 'Sigmoid', 'opt_samp': 'SMOTEENN', 'topology_options': [{'units': 20, 'name': 'hidden'}], 'opt_learning': 'momentum'}, 'results': {'precision': 78.14735336194563, 'mse': 0.21852646638054363, 'confusion': [[76.25, 21.42], [0.43, 1.9]], 'roc': 0.79802551897022789}}
