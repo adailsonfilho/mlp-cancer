@@ -3,7 +3,7 @@
  * @param pad: o formato ta string de dígitos (em zeros)
  */
 Number.prototype.toDigits = function(pad) {
-    var n = '' + this;
+    var n = '' + this.toFixed(20).substr(0, pad.length);
     var ans = pad.substring(0, pad.length - n.length) + n;
     return ans;
 };
@@ -40,10 +40,10 @@ Object.prototype.toHtml = function(cls='none', confNum) {
 						htmlStr = htmlStr + '<p>' + key + ':<ul>';
     					if (key === 'confusion') {
     					    htmlStr = htmlStr + '<p><code>| ' + db[key][0][0].toDigits('0000')
-    					        + ' ' + db[key][0][1].toDigits('0000') + ' |</code></p>';
+    					        + '% ' + db[key][0][1].toDigits('0000') + '% |</code></p>';
 						    
 						    htmlStr = htmlStr + '<p><code>| ' + db[key][1][0].toDigits('0000')
-    					        + ' ' + db[key][1][1].toDigits('0000') + ' |</code></p>';
+    					        + '% ' + db[key][1][1].toDigits('0000') + '% |</code></p>';
     					} else if (key === 'topology_options') {
     					    db[key].forEach(
         						function(k) {
@@ -267,7 +267,13 @@ new Chart(ctx, {
             reverse: false,
             ticks: {
                 beginAtZero: true
-            }
+            },
+            yAxes: [{
+                display: true,
+                ticks: {
+                    suggestedMin: 0
+                }
+            }]
         }
     }
 });
@@ -281,7 +287,13 @@ new Chart(ctx, {
             reverse: false,
             ticks: {
                 beginAtZero: true
-            }
+            },
+            yAxes: [{
+                display: true,
+                ticks: {
+                    suggestedMin: 0
+                }
+            }]
         }
     }
 });
@@ -295,7 +307,13 @@ new Chart(ctx, {
             reverse: false,
             ticks: {
                 beginAtZero: true
-            }
+            },
+            yAxes: [{
+                display: true,
+                ticks: {
+                    suggestedMin: 0
+                }
+            }]
         }
     }
 });
