@@ -62,12 +62,11 @@ class Metrics:
 
 	def plot_mse_curve(error_train, error_valid, path, title='MSE Curve'):
 		plt.title(title)
-	    plt.plot(error_train,label="MSE - Training")
-	    plt.plot(error_valid,label="MSE - Validation")
-	    plt.legend(loc="best")
-	    Metrics.save(title, path)
+		plt.plot(error_train,label="MSE - Training")
+		plt.plot(error_valid,label="MSE - Validation")
+		plt.legend(loc="best")
+		Metrics.save(title, path)
 	    # plt.show()
-
 
 	def save(fname, path, ext='png', close=True, verbose=True):
 

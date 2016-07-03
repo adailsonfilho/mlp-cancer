@@ -1,6 +1,6 @@
 import numpy as np
 from preprocess import Data
-from config import Config
+# from config import Config
 from oversampler import Oversampler
 from undersampler import Undersampler
 from enums import Oversampling
@@ -29,15 +29,13 @@ if __name__ == '__main__':
 	Setup experiment config
 	"""
 
-	#undersampling
-	sampling_options = [Undersampling.ClusterCentroids, Undersampling.SMOTEENN]
-
-	#oversampling
-	#sampling_options = [Oversampling.Repeat]
-	#sampling_options = [Oversampling.Repeat, Oversampling.SmoteRegular]
+	#samplinh
+	sampling_options = [Oversampling.DontUse, Oversampling.Repeat, Oversampling.SmoteRegular, Undersampling.ClusterCentroids]
+	# sampling_options = [Undersampling.ClusterCentroids, Undersampling.SMOTEENN]
 
 	# learning_rule = stochastic gradient descent ('sgd'), 'momentum', 'nesterov', 'adadelta', 'adagrad', 'rmsprop'
-	learning_rule_options = ['momentum', 'sgd']
+	learning_rule_options = ['momentum']
+	# learning_rule_options = ['momentum', 'sgd']
 	#learning_rule_options = ['sgd', 'momentum','rmsprop']
 
 	#following the SKNN docs
@@ -48,28 +46,27 @@ if __name__ == '__main__':
 
 	#based on W.I.W.T. - What I Want To
 	topology_options = [
-		[
-			{'name':'hidden', 'units':5}
-		],
-		[
-			{'name':'hidden', 'units':20}
-		],
-		[
-			{'name':'hidden1', 'units':5},
-			{'name':'hidden2', 'units':2},
-		],
+		# [
+		# 	{'name':'hidden', 'units':5}
+		# ],
+		# [
+		# 	{'name':'hidden', 'units':20}
+		# ],
+		# [
+		# 	{'name':'hidden1', 'units':5},
+		# 	{'name':'hidden2', 'units':2},
+		# ],
 		[
 			{'name':'hidden1', 'units':5},
 			{'name':'hidden2', 'units':4},
 			{'name':'hidden3', 'units':3}
-		],
-		[
-			{'name':'hidden1', 'units':50},
-			{'name':'hidden2', 'units':30},
 		]
+		# [
+		# 	{'name':'hidden1', 'units':50},
+		# 	{'name':'hidden2', 'units':30},
+		# ]
 	]
 	
-	configDesc = {'opt_samp':'', 'opt_learning':'', 'activation_function_options':'', 'activation_function_options':'', 'topology_options':''}
 	nConfig = 0
 	
 	#Create folder with timestamp
@@ -86,42 +83,49 @@ if __name__ == '__main__':
 	for opt_samp in sampling_options:
 
 		if opt_samp != Oversampling.DontUse:
-			configDesc['opt_samp'] = ''
-			configDesc['opt_samp'] = opt_samp.name
+
+			if opt_samp in Oversampling:
+
+				"""
+				TRAINING OVER SAMPLE
+				"""
+				oversampler = Oversampler(opt_samp, training['data'], training['target'], True)
+				training['data'], training['target'] = oversampler.balance()
+
+				"""
+				VALIDATION OVER SAMPLE
+				"""
+				oversampler = Oversampler(opt_samp,validation['data'], validation['target'],True)
+				validation['data'], validation['target'] = oversampler.balance()
+
+			elif opt_samp in Undersampling:
+				"""
+				TRAINING OVER SAMPLE
+				"""
+				undersampler = Undersampler(opt_samp, training['data'], training['target'], True)
+				training['data'], training['target'] = undersampler.balance()
+
+				"""
+				VALIDATION OVER SAMPLE
+				"""
+				undersampler = Undersampler(opt_samp,validation['data'], validation['target'],True)
+				validation['data'], validation['target'] = undersampler.balance()
+			else:
+				raise('Nonexistent sampling type: '+opt_samp.name)
 
 			"""
-			TRAINING OVER SAMPLE
-			"""
-			#oversampler = Oversampler(opt_samp, training['data'], training['target'], True)
-			#training['data'], training['target'] = oversampler.balance()
-			undersampler = Undersampler(opt_samp, training['data'], training['target'], True)
-			training['data'], training['target'] = undersampler.balance()
-
-			"""
-			VALIDATION OVER SAMPLE
-			"""
-			#oversampler = Oversampler(opt_samp,validation['data'], validation['target'],True)
-			#validation['data'], validation['target'] = oversampler.balance()
-			undersampler = Undersampler(opt_samp,validation['data'], validation['target'],True)
-			validation['data'], validation['target'] = undersampler.balance()
-
-			"""
-			DO NOT MAKE SENSE OVERSAMPLING OF TESTING SET
+			DOES NOT MAKE SENSE OVERSAMPLING OF TESTING SET, THINK ABOUT IT...
 			"""
 		base = {'training':training, 'validation': validation, 'testing': testing}
 
 		for opt_learning in learning_rule_options:
-			configDesc['opt_learning'] = ''
-			configDesc['opt_learning'] = opt_learning
 			for opt_top in topology_options:
-				configDesc['topology_options'] = ''
-				configDesc['topology_options'] = opt_top
 				for opt_actvfunc in activation_function_options:
-					configDesc['activation_function_options'] = ''
-					configDesc['activation_function_options'] = opt_actvfunc
+
 					configDir = os.path.join(mydir, 'config_' + str(nConfig))
 					os.makedirs(configDir)
-					config = Config(base, opt_learning, opt_top, opt_actvfunc, force_overfiting = False)
+
+					# config = Config(base, opt_learning, opt_top, opt_actvfunc, force_overfiting = False)
 
 					#data storing for charts
 					error_train = []
@@ -139,8 +143,8 @@ if __name__ == '__main__':
 					nn = Classifier(
 					learning_rule = opt_learning,
 				    layers=layers,
-				    learning_rate=0.001,
-				    n_iter=10,
+				    learning_rate=0.0001,
+				    n_iter=10000,
 				    valid_set=(base['validation']['data'],base['validation']['target']),
 				    callback={'on_epoch_finish': store_errors},
 				    verbose = verbose
@@ -184,9 +188,10 @@ if __name__ == '__main__':
 					print("acurracy:", acurracy,'%')
 					print('errors',errors,'of', len(base['testing']['data']))
 					
-					current_config_result = {'config':configDesc, 'results':{'mse':test_mse,'confusion':confusion_matrix_percentage
-					,'roc':roc_area,'precision':acurracy}}
-					config_results.append(current_config_result)
+					configDesc = {'opt_samp':opt_samp.name, 'opt_learning':opt_learning, 'activation_function_options':opt_actvfunc, 'topology_options':opt_top}
+
+					current_config_result = {'config':configDesc, 'results':{'mse':test_mse,'confusion':confusion_matrix_percentage,'roc':roc_area,'precision':acurracy}}
+					config_results.append(current_config_result.copy())
 
 					Metrics.saveConfig(os.path.join(configDir, 'config-results.json'), current_config_result)
 
@@ -194,7 +199,7 @@ if __name__ == '__main__':
 		
 	text = 'var configs = ['
 	for config in config_results[:-1]:
-		print(config + '\n')
+		print(str(config) + '\n')
 		text += str(config) + ','
 	
 	text += str(config_results[-1]) + '];'
