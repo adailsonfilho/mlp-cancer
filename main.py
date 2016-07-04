@@ -210,7 +210,6 @@ if __name__ == '__main__':
 	
 	text = 'var configs = ['
 	for config in config_results[:-1]:
-		#print(str(config) + '\n')
 		text += str(config) + ','
 	
 	text += str(config_results[-1]) + '];'
