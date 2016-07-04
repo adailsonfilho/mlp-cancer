@@ -21,6 +21,8 @@ class Undersampler:
 
 			# Undersampling por SMOTEENN
 			self.undersampler = SMOTEENN(verbose = verbose, ratio=ratio)
+		else:
+			raise("Nonexistent undersampling type: "+kind.name)
 
 	def balance(self):
 		#return self.undersampler.fit_transform(self.data, self.target)

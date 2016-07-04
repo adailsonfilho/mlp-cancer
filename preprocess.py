@@ -31,14 +31,14 @@ class Data:
 		self.all_data = np.array(self.all_data)
 		
 		if target == None:
-			self.target = self.all_data[:,-1].astype('int')
+			self.target = self.all_data[:,-1]
 		else:
 			self.target = target
 
 		self.target_options= np.array(sorted(list(set(self.target))))
 		
 		if data == None:
-			self.data = self.all_data[:,:-1].astype('int')
+			self.data = self.all_data[:,:-1]
 		else:
 			self.data = data
 

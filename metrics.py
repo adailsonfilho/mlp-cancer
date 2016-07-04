@@ -37,37 +37,40 @@ class Metrics:
 		# plt.show()
 
 	def plot_roc_curve(y_test, y_score, path, title='ROC Curve'):
+
 		fpr = dict()
 		tpr = dict()
 		roc_auc = dict()
-		fpr, tpr, _ = roc_curve(y_test, y_score)
+		fpr, tpr, _ = roc_curve(y_test[:, 0], y_score[:, 0])
 		roc_auc = auc(fpr, tpr)
 
 	    # Plot all ROC curves
 		plt.figure()
-		print(roc_auc)
-		plt.plot(fpr, tpr, label='ROC curve (area = ' + str(roc_auc) + ' )')
-		#plt.grid()
+		
+		plt.plot(fpr, tpr, label='ROC curve (area = ' + str(roc_auc) + ')')
+		plt.grid()
 		plt.plot([0, 1], [0, 1], 'k--')
 		plt.xlim([0.0, 1.0])
-		plt.ylim([0.0, 1.05])
+		plt.ylim([0.0, 1.0])
 		plt.title(title)
 		plt.xlabel('False Positive Rate')
 		plt.ylabel('True Positive Rate')
 		plt.legend(loc="lower right")
 		Metrics.save(title, path)
-		
+		#plt.show()
+
 		return roc_auc
-	    # plt.show()
+	    
 
 	def plot_mse_curve(error_train, error_valid, path, title='MSE Curve'):
 		plt.title(title)
 		plt.plot(error_train,label="MSE - Training")
 		plt.plot(error_valid,label="MSE - Validation")
 		plt.legend(loc="best")
+		plt.ylabel('Error Rate')
+		plt.xlabel('Epochs')
 		Metrics.save(title, path)
 	    # plt.show()
-
 
 	def save(fname, path, ext='png', close=True, verbose=True):
 

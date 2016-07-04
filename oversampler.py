@@ -9,7 +9,7 @@ class Repeater:
 		self.verbose = verbose
 
 	
-	def fit_transform(self, data, target):
+	def fit_sample(self, data, target):
 
 		target_options= np.array(sorted(list(set(target))))
 
@@ -79,4 +79,4 @@ class Oversampler:
 			self.oversampler = Repeater(verbose = verbose)
 
 	def balance(self):
-		return self.oversampler.fit_transform(self.data, self.target)
+		return self.oversampler.fit_sample(self.data, self.target)
