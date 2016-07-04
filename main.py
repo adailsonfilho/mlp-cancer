@@ -14,6 +14,25 @@ import shutil
 
 from metrics import Metrics
 
+def calc_confusion_matrix(vp,fp,fn,vn,pos_len, neg_len):
+	print('>> MATRIX CONFUSION CHECK')
+	cm = [[vp,fp],[fn,vn]]
+
+	#VP
+	cm [0][0] /= pos_len
+
+	#FP
+	cm [0][1] = 1 - cm [0][0]
+
+	#VN
+	cm [1][1] /= neg_len
+
+	#FN
+	cm [1][0] = 1 - cm [1][1]
+
+	return cm
+
+
 if __name__ == '__main__':
 
 	verbose = True
@@ -149,7 +168,7 @@ if __name__ == '__main__':
 					nn = Classifier(
 							learning_rule = opt_learning,
 						    layers=layers,
-						    learning_rate=0.0001,
+						    learning_rate=0.001,
 						    n_iter=10000,
 						    valid_set=(base['validation']['data'],base['validation']['target']),
 						    callback={'on_epoch_finish': store_errors},
@@ -167,15 +186,32 @@ if __name__ == '__main__':
 					target = base['testing']['target']
 					targetByClass = np.array([0,0])
 					
-					errors = 0
+					errors_total = 0
+					vp = 0
+					fp = 0
+					vn = 0
+					fn = 0
+
 					test_mse = 0
 					for predicted, obj in zip(predictions,base['testing']['target']):
 						predicted
 
 						if predicted != obj:
 							# print(' error')
-							errors += 1
+							errors_total += 1
 							test_mse += math.pow(predicted-obj, 2)
+
+						if predicted == 1:
+							if obj == 1:
+								vp +=1
+							elif obj == 0:
+								fp +=1
+						elif predicted == 0:
+							if obj == 1:
+								fn +=1
+							elif obj == 0:
+								vn +=1
+
 
 						if obj == 0:
 							targetByClass = np.vstack((targetByClass, [1, 0]))
@@ -191,9 +227,12 @@ if __name__ == '__main__':
 					PLOT AND CALCULATE METRICS
 					"""
 
+					pos_len = len(base['testing']['data'][base['testing']['target']==1])
+					neg_len = len(base['testing']['data'][base['testing']['target']==0])
+					confusion_matrix_percentage = calc_confusion_matrix(vp,fp,fn,vn,pos_len,neg_len)
+
 					#Confusion Matrix
-					confusion_matrix = Metrics.plot_confusion_matrix(target, predictions, configDir)
-					confusion_matrix_percentage = np.round(np.multiply(np.divide(confusion_matrix, np.array([target.size])),np.array([100])),2).tolist()
+					Metrics.plot_confusion_matrix(confusion_matrix_percentage, configDir)
 
 					#MSE (Training and Validation)
 					Metrics.plot_mse_curve(np.array(error_train), np.array(error_valid), configDir)
@@ -202,20 +241,22 @@ if __name__ == '__main__':
 					roc_area = Metrics.plot_roc_curve(targetByClass, prob_predictions, configDir)
 
 					#precision
-					acurracy = ((len(base['testing']['data'])-errors)/len(base['testing']['data']))*100
+					acurracy = ((len(base['testing']['data'])-errors_total)/len(base['testing']['data']))*100
 
 					print("acurracy:", acurracy,'%')
-					print('errors',errors,'of', len(base['testing']['data']))
+					print('errors',errors_total,'of', len(base['testing']['data']))
 					
 					configDesc = {'opt_samp':opt_samp.name, 'opt_learning':opt_learning, 'activation_function_options':opt_actvfunc, 'topology_options':opt_top}
 
-					current_config_result = {'config':configDesc, 'results':{'mse':test_mse,'confusion':confusion_matrix_percentage,'roc':roc_area,'precision':acurracy}}
+					current_config_result = {'config':configDesc, 'results':{'mse':test_mse,'confusion':{'true_positive':confusion_matrix_percentage[0][0],'false_positive':confusion_matrix_percentage[0][1],'false_negative':confusion_matrix_percentage[1][0],'true_negative':confusion_matrix_percentage[1][1]},'roc':roc_area,'precision':acurracy}}
 					config_results.append(current_config_result.copy())
 
 					Metrics.saveConfig(os.path.join(configDir, 'config-results.json'), current_config_result)
 
 					nConfig = nConfig+1
 					current_config_result = {}
+
+
 	
 	text = 'var configs = ['
 	for config in config_results[:-1]:

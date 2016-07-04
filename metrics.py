@@ -16,9 +16,14 @@ import shutil
 
 class Metrics:
 
-	def plot_confusion_matrix(target, predictions, path, title='Confusion matrix', cmap=plt.cm.Blues):
-		cm = confusion_matrix(target, predictions)
-		np.set_printoptions(precision=2)
+	def plot_confusion_matrix(confusion_matrix, path, title='Confusion matrix', cmap=plt.cm.Blues):
+		
+		if type(confusion_matrix) == type([[]]):
+			cm = np.array(confusion_matrix)
+		else:
+			cm = confusion_matrix
+
+		np.set_printoptions(precision=4)
 		plt.figure()
 		plt.imshow(cm, interpolation='nearest', cmap=cmap)
 		plt.title(title)
