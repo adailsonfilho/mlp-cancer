@@ -11,6 +11,7 @@ import datetime
 import os, sys
 import math
 import shutil
+import ipdb
 
 from metrics import Metrics
 
@@ -22,16 +23,18 @@ if __name__ == '__main__':
 	Pre-process
 	"""
 
-	base = Data('mammography-consolidated.csv', verbose=verbose)
+	base = Data('mammography-consolidated.csv', verbose=verbose,normalize=True)
 	training, validation, testing = base.split()
+
+	ipdb.set_trace()
 
 	"""
 	Setup experiment config
 	"""
 
 	#samplinh
-	sampling_options = [Oversampling.SmoteRegular]
-	# sampling_options = [Undersampling.ClusterCentroids, Undersampling.SMOTEENN]
+	# sampling_options = [Oversampling.SmoteRegular]
+	sampling_options = [Oversampling.DontUse, Oversampling.Repeat, Oversampling.SmoteRegular, Undersampling.ClusterCentroids, Undersampling.SMOTEENN]
 
 	# learning_rule = stochastic gradient descent ('sgd'), 'momentum', 'nesterov', 'adadelta', 'adagrad', 'rmsprop'
 	learning_rule_options = ['momentum']
@@ -118,6 +121,12 @@ if __name__ == '__main__':
 			"""
 		base = {'training':training, 'validation': validation, 'testing': testing}
 
+		if opt_samp == Oversampling.DontUse:
+
+			w_train = np.zeros(base['training']['data'].shape[0])
+			w_train[base['training']['target'] == 0] = 0.2
+			w_train[base['training']['target'] == 1] = 1.8
+
 		for opt_learning in learning_rule_options:
 			for opt_top in topology_options:
 				for opt_actvfunc in activation_function_options:
@@ -140,17 +149,31 @@ if __name__ == '__main__':
 					layers = [Layer(type=opt_actvfunc,name=topology['name'],units=topology['units']) for topology in opt_top];
 					layers.append(Layer(type='Softmax',name="output_layer"))
 
-					nn = Classifier(
-					learning_rule = opt_learning,
-				    layers=layers,
-				    learning_rate=0.001,
-				    n_iter=10000,
-				    valid_set=(base['validation']['data'],base['validation']['target']),
-				    callback={'on_epoch_finish': store_errors},
-				    verbose = verbose
-				    )
+					if opt_samp == Oversampling.DontUse:
+						nn = Classifier(
+							learning_rule = opt_learning,
+						    layers=layers,
+						    normalize='weights',
+						    learning_rate=0.0001,
+						    n_iter=10000,
+						    valid_set=(base['validation']['data'],base['validation']['target']),
+						    callback={'on_epoch_finish': store_errors},
+						    verbose = verbose
+						    )
 
-					nn.fit(base['training']['data'],base['training']['target'])
+						nn.fit(base['training']['data'],base['training']['target'],w_train)
+					else:
+						nn = Classifier(
+							learning_rule = opt_learning,
+						    layers=layers,
+						    learning_rate=0.0001,
+						    n_iter=10000,
+						    valid_set=(base['validation']['data'],base['validation']['target']),
+						    callback={'on_epoch_finish': store_errors},
+						    verbose = verbose
+						    )
+
+						nn.fit(base['training']['data'],base['training']['target'])
 
 					print('Testing')
 					predictions = np.squeeze(np.asarray(nn.predict(base['testing']['data'])))

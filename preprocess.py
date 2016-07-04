@@ -2,7 +2,7 @@ import numpy as np
 
 class Data:
 
-	def __init__(self, path=None, separator=',', foreachline = None,verbose = False, target=None, data=None):
+	def __init__(self, path=None, separator=',', foreachline = None,verbose = False, target=None, data=None, normalize=False):
 
 		self.path = path
 		self.separator = separator
@@ -41,6 +41,16 @@ class Data:
 			self.data = self.all_data[:,:-1]
 		else:
 			self.data = data
+
+		if normalize:
+				min_ref = self.data.min()
+				max_ref = self.data.max()
+
+				if verbose:
+					print('>> NORMALIZING: Min = ',min_ref,"; Max = ", max_ref)
+
+				self.data -= min_ref
+				self.data /= (max_ref-min_ref)
 
 		self.dimension = self.data.shape[1]
 
