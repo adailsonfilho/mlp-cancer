@@ -11,7 +11,6 @@ import datetime
 import os, sys
 import math
 import shutil
-import ipdb
 
 from metrics import Metrics
 
@@ -25,8 +24,6 @@ if __name__ == '__main__':
 
 	base = Data('mammography-consolidated.csv', verbose=verbose,normalize=True)
 	training, validation, testing = base.split()
-
-	ipdb.set_trace()
 
 	"""
 	Setup experiment config
@@ -149,11 +146,9 @@ if __name__ == '__main__':
 					layers = [Layer(type=opt_actvfunc,name=topology['name'],units=topology['units']) for topology in opt_top];
 					layers.append(Layer(type='Softmax',name="output_layer"))
 
-					if opt_samp == Oversampling.DontUse:
-						nn = Classifier(
+					nn = Classifier(
 							learning_rule = opt_learning,
 						    layers=layers,
-						    normalize='weights',
 						    learning_rate=0.0001,
 						    n_iter=10000,
 						    valid_set=(base['validation']['data'],base['validation']['target']),
@@ -161,18 +156,9 @@ if __name__ == '__main__':
 						    verbose = verbose
 						    )
 
+					if opt_samp == Oversampling.DontUse:
 						nn.fit(base['training']['data'],base['training']['target'],w_train)
 					else:
-						nn = Classifier(
-							learning_rule = opt_learning,
-						    layers=layers,
-						    learning_rate=0.0001,
-						    n_iter=10000,
-						    valid_set=(base['validation']['data'],base['validation']['target']),
-						    callback={'on_epoch_finish': store_errors},
-						    verbose = verbose
-						    )
-
 						nn.fit(base['training']['data'],base['training']['target'])
 
 					print('Testing')
