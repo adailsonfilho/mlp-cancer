@@ -317,3 +317,9 @@ new Chart(ctx, {
         }
     }
 });
+
+(function() {
+    $('#division').hide();
+    $('#structure').hide();
+    $('#results').hide();
+}());

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>NN Tests with various configurations</title>
+		<title>Cancer Detection in Mammograms</title>
 		<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css" />
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
@@ -39,48 +39,94 @@
             .mTopM10 {
             	margin-top: -10 px !important;
             }
+            
+            .text {
+            	font-size: 130% !important;
+            }
 		</style>
 	</head>
 	<body>
 	    <div class="container">
 	        <h1 id="title">
-				NN Tests with various configurations
+				Cancer Detection in Mammograms
 			</h1>
 	    </div>
 	    
 	    <div class="container">
-	    	<h2 id="configurations-label">
-				Configurations
-			</h2>
-			
-			<div id="main"></div>
+	    	<div id="problem" class="container jumbotrom well">
+	    		<h2>The problem</h2>
+	    		<p class="container text">
+	    			Diagnose cases of the presence of cancer cells in computerized tomography image data.
+	    		</p>
+	    		<button id="n1" class="btn btn-info btn-md pull-right" onClick="$('#division').show(); $('#n1').hide();">
+	    			Next >>
+	    		</button>
+	    	</div>
+	    	
+	    	<div id="division" class="container jumbotrom well">
+	    		<h2>Division of the data</h2>
+	    		<ul class="text">
+	    			<li>11.183 cases</li>
+	    			<li>6 characteristics</li>
+	    			<li>Majority class: 10.923 cases (No cancer)</li>
+	    			<li>Minority class: 260 cases</li>
+	    		</ul>
+	    		<button id="n2" class="btn btn-info btn-md pull-right" onClick="$('#structure').show(); $('#n2').hide();">
+	    			Next >>
+	    		</button>
+	    	</div>
+	    	
+	    	<div id="structure" class="container jumbotrom well">
+	    		<h2>Experimental structure</h2>
+	    		<button id="n3" class="btn btn-info btn-md pull-right" onClick="$('#results').show(); $('#n3').hide();">
+	    			Next >>
+	    		</button>
+	    	</div>
+	    	
+	    	<div id="results" class="container">
+	    		<h2>Interpreting the results</h2>
+	    		<div class="container">
+			    	<h3 id="parameters-label">
+						Parameters
+					</h3>
+					<ul class="text">
+						<li>Topology: number of units</li>
+						<li>...</li>
+					</ul>
+			    </div>
+	    		
+	    		<div class="container">
+			    	<h3 id="configurations-label">
+						Configurations
+					</h3>
+					
+					<div id="main"></div>
+			    </div>
+			    
+			    <div class="container">
+					<h3 id="graph-label">
+						Comparison graphs
+					</h3>
+					
+					<div class="container">
+						<h4 id="precision-graph-label">
+							Precision
+						</h4>
+						<canvas id="graph-precision" width="1000" height="600"></canvas>
+						
+						<h4 id="mse-graph-label">
+							Final MSE
+						</h4>
+						<canvas id="graph-mse" width="1000" height="600"></canvas>
+						
+						<h4 id="roc-graph-label">
+							ROC Area
+						</h4>
+						<canvas id="graph-roc" width="1000" height="600"></canvas>
+					</div>
+				</div>
+	    	</div>
 	    </div>
-	    
-	    <div class="container">
-			<h2 id="graph-label">
-				Comparison graphs
-			</h2>
-			
-			<div class="container">
-				<h3 id="precision-graph-label">
-					Precision
-				</h3>
-				<canvas id="graph-precision" width="1000" height="600"></canvas>
-				
-				<h3 id="mse-graph-label">
-					Final MSE
-				</h3>
-				<canvas id="graph-mse" width="1000" height="600"></canvas>
-				
-				<h3 id="roc-graph-label">
-					ROC Area
-				</h3>
-				<canvas id="graph-roc" width="1000" height="600"></canvas>
-			</div>
-		</div>
-		
-		
-		
 		
 		<!-- Modal -->
 		<div id="myModal" class="modal fade" role="dialog">
