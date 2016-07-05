@@ -11,7 +11,7 @@
             	float: left !important;
             	margin-top: 10px !important;
             	margin-right: 1.5% !important;
-            	width: 31.5% !important;
+            	width: 30.5% !important;
             	font-size: 15px !important;
             }
             			
@@ -88,6 +88,9 @@
 		    	<div id="structure" class="panel panel-default">
 		    		<div class="panel-heading"><h4>Experimental structure</h4></div>
 		    		<div class=" panel-body">
+		    			<p>
+		    				We choose to run all combinations of params.
+		    			</p>
 			    		<button id="n3" class="btn btn-info btn-md pull-right" onClick="$('#results').show(); $('#main-t').hide();">
 			    			Interpreting the results >>
 			    		</button>
@@ -103,8 +106,10 @@
 							Parameters
 						</h3>
 						<ul class="text">
-							<li>Topology: number of units</li>
-							<li>...</li>
+							<li>Sampling: None, Oversampling (Repeat, SMOTE), Undersampling (Cluster Centroids, SMOTEENN)</li>
+							<li>Topology: number of units and layers ammount</li>
+							<li>Activation function: Sigmoid, Rectifier, Tanh</li>
+							<li>Learning rule: Momentum, sgd</li>
 						</ul>
 				    </div>
 		    		
