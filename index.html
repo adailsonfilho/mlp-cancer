@@ -41,7 +41,7 @@
             }
             
             .text {
-            	font-size: 130% !important;
+            	font-size: 110% !important;
             }
 		</style>
 	</head>
@@ -54,77 +54,85 @@
 	    
 	    <div class="container">
 	    	<div id="main-t">
-		    	<div id="problem" class="container jumbotrom well">
-		    		<h2>The problem</h2>
-		    		<p class="container text">
-		    			Diagnose cases of the presence of cancer cells in computerized tomography image data.
-		    		</p>
-		    		<button id="n1" class="btn btn-info btn-md pull-right" onClick="$('#division').show(); $('#n1').hide();">
-		    			Division of the data >>
-		    		</button>
+		    	<div id="problem" class="panel panel-default">
+		    		<div class="panel-heading"><h4>The problem</h4></div>
+		    		<div class=" panel-body">
+			    		<p class="text">
+			    			Diagnose cases of the presence of cancer cells in computerized tomography image data.
+			    		</p>
+		    			<button id="n1" class="btn btn-info btn-md pull-right" onClick="$('#division').show(); $('#n1').hide();">
+			    			Division of the data >>
+			    		</button>
+			    	</div>
 		    	</div>
 		    	
-		    	<div id="division" class="container jumbotrom well">
-		    		<h2>Division of the data</h2>
-		    		<ul class="text">
-		    			<li>11.183 cases</li>
-		    			<li>6 characteristics</li>
-		    			<li>Majority class: 10.923 cases (No cancer)</li>
-		    			<li>Minority class: 260 cases</li>
-		    		</ul>
-		    		<button id="n2" class="btn btn-info btn-md pull-right" onClick="$('#structure').show(); $('#n2').hide();">
-		    			Experimental structure >>
-		    		</button>
+		    	<div id="division" class="panel panel-default">
+		    		<div class="panel-heading"><h4>Division of the data</h4></div>
+		    		<div class=" panel-body">
+			    		<ul class="text">
+			    			<li>11.183 cases</li>
+			    			<li>6 characteristics</li>
+			    			<li>Majority class: 10.923 cases (No cancer)</li>
+			    			<li>Minority class: 260 cases</li>
+			    		</ul>
+			    		<button id="n2" class="btn btn-info btn-md pull-right" onClick="$('#structure').show(); $('#n2').hide();">
+			    			Experimental structure >>
+			    		</button>
+			    	</div>
 		    	</div>
 		    	
-		    	<div id="structure" class="container jumbotrom well">
-		    		<h2>Experimental structure</h2>
-		    		<button id="n3" class="btn btn-info btn-md pull-right" onClick="$('#results').show(); $('#main-t').hide();">
-		    			Interpreting the results >>
-		    		</button>
+		    	<div id="structure" class="panel panel-default">
+		    		<div class="panel-heading"><h4>Experimental structure</h4></div>
+		    		<div class=" panel-body">
+			    		<button id="n3" class="btn btn-info btn-md pull-right" onClick="$('#results').show(); $('#main-t').hide();">
+			    			Interpreting the results >>
+			    		</button>
+			    	</div>
 		    	</div>
 		    </div>
 	    	
-	    	<div id="results" class="container">
-	    		<h2>Interpreting the results</h2>
-	    		<div class="container">
-			    	<h3 id="parameters-label">
-						Parameters
-					</h3>
-					<ul class="text">
-						<li>Topology: number of units</li>
-						<li>...</li>
-					</ul>
-			    </div>
-	    		
-	    		<div class="container">
-			    	<h3 id="configurations-label">
-						Configurations
-					</h3>
-					
-					<div id="main"></div>
-			    </div>
-			    
-			    <div class="container">
-					<h3 id="graph-label">
-						Comparison graphs
-					</h3>
-					
-					<div class="container">
-						<h4 id="precision-graph-label">
-							Precision
-						</h4>
-						<canvas id="graph-precision" width="1000" height="600"></canvas>
+	    	<div id="results" class="panel panel-default">
+	    		<div class="panel-heading"><h4>Interpreting the results</h4></div>
+	    		<div class=" panel-body">
+		    		<div class="container">
+				    	<h3 id="parameters-label">
+							Parameters
+						</h3>
+						<ul class="text">
+							<li>Topology: number of units</li>
+							<li>...</li>
+						</ul>
+				    </div>
+		    		
+		    		<div class="container">
+				    	<h3 id="configurations-label">
+							Configurations
+						</h3>
 						
-						<h4 id="mse-graph-label">
-							Final MSE
-						</h4>
-						<canvas id="graph-mse" width="1000" height="600"></canvas>
+						<div id="main"></div>
+				    </div>
+				    
+				    <div class="container">
+						<h3 id="graph-label">
+							Comparison graphs
+						</h3>
 						
-						<h4 id="roc-graph-label">
-							ROC Area
-						</h4>
-						<canvas id="graph-roc" width="1000" height="600"></canvas>
+						<div class="container">
+							<h4 id="precision-graph-label">
+								Precision
+							</h4>
+							<canvas id="graph-precision" width="1000" height="600"></canvas>
+							
+							<h4 id="mse-graph-label">
+								Final MSE
+							</h4>
+							<canvas id="graph-mse" width="1000" height="600"></canvas>
+							
+							<h4 id="roc-graph-label">
+								ROC Area
+							</h4>
+							<canvas id="graph-roc" width="1000" height="600"></canvas>
+						</div>
 					</div>
 				</div>
 	    	</div>
