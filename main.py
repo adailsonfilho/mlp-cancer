@@ -33,6 +33,23 @@ def calc_confusion_matrix(vp,fp,fn,vn,pos_len, neg_len):
 	return cm
 
 
+def update_res(config_results, mydir, latest):
+	if (os.path.exists(latest)):
+		shutil.rmtree(latest)
+	
+	text = 'var configs = ['
+	for config in config_results[:-1]:
+		text += str(config) + ','
+	
+	text += str(config_results[-1]) + '];'
+
+	if (os.path.exists('config.js')):
+		os.remove('config.js')
+	
+	Metrics.saveConfig('config.js', text)
+	Metrics.copyDirectory(mydir, latest)
+
+
 if __name__ == '__main__':
 
 	verbose = True
@@ -173,6 +190,8 @@ if __name__ == '__main__':
 						    layers=layers,
 						    learning_rate=0.001,
 						    n_iter=10000,
+						    #n_stable=50,
+						    #f_stable=0.01,
 						    valid_set=(base['validation']['data'],base['validation']['target']),
 						    callback={'on_epoch_finish': store_errors},
 						    verbose = verbose
@@ -263,15 +282,7 @@ if __name__ == '__main__':
 					training = training_bkp.copy()
 					validation = validation_bkp.copy()
 					testing = testing_bkp.copy()
+					
+					update_res(config_results, mydir, latest)
 	
-	text = 'var configs = ['
-	for config in config_results[:-1]:
-		text += str(config) + ','
-	
-	text += str(config_results[-1]) + '];'
-
-	if (os.path.exists('config.js')):
-		os.remove('config.js')
-	
-	Metrics.saveConfig('config.js', text)
-	Metrics.copyDirectory(mydir, latest)
+	update_res(config_results, mydir, latest)
