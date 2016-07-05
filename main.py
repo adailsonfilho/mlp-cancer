@@ -43,6 +43,9 @@ if __name__ == '__main__':
 
 	base = Data('mammography-consolidated.csv', verbose=verbose,normalize=True)
 	training, validation, testing = base.split()
+	training_bkp = training.copy()
+	validation_bkp = validation.copy()
+	testing_bkp = testing.copy()
 
 	"""
 	Setup experiment config
@@ -256,7 +259,10 @@ if __name__ == '__main__':
 					nConfig = nConfig+1
 					current_config_result = {}
 
-
+					#reset databases from sampling changes
+					training = training_bkp.copy()
+					validation = validation_bkp.copy()
+					testing = testing_bkp.copy()
 	
 	text = 'var configs = ['
 	for config in config_results[:-1]:
