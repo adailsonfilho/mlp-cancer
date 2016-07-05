@@ -53,35 +53,37 @@
 	    </div>
 	    
 	    <div class="container">
-	    	<div id="problem" class="container jumbotrom well">
-	    		<h2>The problem</h2>
-	    		<p class="container text">
-	    			Diagnose cases of the presence of cancer cells in computerized tomography image data.
-	    		</p>
-	    		<button id="n1" class="btn btn-info btn-md pull-right" onClick="$('#division').show(); $('#n1').hide();">
-	    			Next >>
-	    		</button>
-	    	</div>
-	    	
-	    	<div id="division" class="container jumbotrom well">
-	    		<h2>Division of the data</h2>
-	    		<ul class="text">
-	    			<li>11.183 cases</li>
-	    			<li>6 characteristics</li>
-	    			<li>Majority class: 10.923 cases (No cancer)</li>
-	    			<li>Minority class: 260 cases</li>
-	    		</ul>
-	    		<button id="n2" class="btn btn-info btn-md pull-right" onClick="$('#structure').show(); $('#n2').hide();">
-	    			Next >>
-	    		</button>
-	    	</div>
-	    	
-	    	<div id="structure" class="container jumbotrom well">
-	    		<h2>Experimental structure</h2>
-	    		<button id="n3" class="btn btn-info btn-md pull-right" onClick="$('#results').show(); $('#n3').hide();">
-	    			Next >>
-	    		</button>
-	    	</div>
+	    	<div id="main-t">
+		    	<div id="problem" class="container jumbotrom well">
+		    		<h2>The problem</h2>
+		    		<p class="container text">
+		    			Diagnose cases of the presence of cancer cells in computerized tomography image data.
+		    		</p>
+		    		<button id="n1" class="btn btn-info btn-md pull-right" onClick="$('#division').show(); $('#n1').hide();">
+		    			Division of the data >>
+		    		</button>
+		    	</div>
+		    	
+		    	<div id="division" class="container jumbotrom well">
+		    		<h2>Division of the data</h2>
+		    		<ul class="text">
+		    			<li>11.183 cases</li>
+		    			<li>6 characteristics</li>
+		    			<li>Majority class: 10.923 cases (No cancer)</li>
+		    			<li>Minority class: 260 cases</li>
+		    		</ul>
+		    		<button id="n2" class="btn btn-info btn-md pull-right" onClick="$('#structure').show(); $('#n2').hide();">
+		    			Experimental structure >>
+		    		</button>
+		    	</div>
+		    	
+		    	<div id="structure" class="container jumbotrom well">
+		    		<h2>Experimental structure</h2>
+		    		<button id="n3" class="btn btn-info btn-md pull-right" onClick="$('#results').show(); $('#main-t').hide();">
+		    			Interpreting the results >>
+		    		</button>
+		    	</div>
+		    </div>
 	    	
 	    	<div id="results" class="container">
 	    		<h2>Interpreting the results</h2>

@@ -173,6 +173,8 @@ if __name__ == '__main__':
 						    layers=layers,
 						    learning_rate=0.001,
 						    n_iter=10000,
+						    #n_stable=50,
+						    #f_stable=0.01,
 						    valid_set=(base['validation']['data'],base['validation']['target']),
 						    callback={'on_epoch_finish': store_errors},
 						    verbose = verbose
