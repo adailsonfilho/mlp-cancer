@@ -34,6 +34,9 @@ def calc_confusion_matrix(vp,fp,fn,vn,pos_len, neg_len):
 
 
 def update_res(config_results, mydir, latest):
+	if (os.path.exists(latest)):
+		shutil.rmtree(latest)
+	
 	text = 'var configs = ['
 	for config in config_results[:-1]:
 		text += str(config) + ','
