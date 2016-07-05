@@ -1,0 +1,1 @@
+{'results': {'confusion': {'true_positive': 0.0, 'false_negative': 0.0, 'true_negative': 1.0, 'false_positive': 1.0}, 'precision': 97.67525035765378, 'roc': 0.90758245782046587, 'mse': 0.023247496423462088}, 'config': {'activation_function_options': 'Sigmoid', 'opt_samp': 'DontUse', 'topology_options': [{'name': 'hidden', 'units': 20}], 'opt_learning': 'momentum'}}

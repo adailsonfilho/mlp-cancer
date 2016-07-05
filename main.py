@@ -57,23 +57,23 @@ if __name__ == '__main__':
 
 	# learning_rule = stochastic gradient descent ('sgd'), 'momentum', 'nesterov', 'adadelta', 'adagrad', 'rmsprop'
 	learning_rule_options = ['momentum']
-	# learning_rule_options = ['momentum', 'sgd']
+	#learning_rule_options = ['momentum', 'sgd']
 	#learning_rule_options = ['sgd', 'momentum','rmsprop']
 
 	#following the SKNN docs
-	activation_function_options = ['Sigmoid']
-	#activation_function_options = ['Sigmoid', 'Rectifier', 'Tanh']
+	#activation_function_options = ['Sigmoid']
+	activation_function_options = ['Sigmoid', 'Rectifier', 'Tanh']
 
 	#activation_function_options = ['Rectifier', 'Sigmoid', 'Tanh', 'ExpLin']
 
 	#based on W.I.W.T. - What I Want To
 	topology_options = [
-		# [
-		# 	{'name':'hidden', 'units':5}
-		# ],
-		# [
-		# 	{'name':'hidden', 'units':20}
-		# ],
+		[
+			{'name':'hidden', 'units':5}
+		],
+		[
+			{'name':'hidden', 'units':20}
+		],
 		# [
 		# 	{'name':'hidden1', 'units':5},
 		# 	{'name':'hidden2', 'units':2},
